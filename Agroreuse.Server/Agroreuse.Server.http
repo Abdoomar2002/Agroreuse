@@ -1,0 +1,6 @@
+@Agroreuse.Server_HostAddress = http://localhost:5199
+
+GET {{Agroreuse.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

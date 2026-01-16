@@ -1,0 +1,10 @@
+<Solution>
+  <Project Path="Agroreuse.Application/Agroreuse.Application.csproj" />
+  <Project Path="agroreuse.client/agroreuse.client.esproj">
+    <Build />
+    <Deploy />
+  </Project>
+  <Project Path="Agroreuse.Domain/Agroreuse.Domain.csproj" />
+  <Project Path="Agroreuse.Infrastructure/Agroreuse.Infrastructure.csproj" />
+  <Project Path="Agroreuse.Server/Agroreuse.Server.csproj" />
+</Solution>
