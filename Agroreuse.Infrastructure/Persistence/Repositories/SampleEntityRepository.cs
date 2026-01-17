@@ -9,7 +9,7 @@ namespace Agroreuse.Infrastructure.Persistence.Repositories;
 /// </summary>
 public class SampleEntityRepository : Repository<SampleEntity>, ISampleEntityRepository
 {
-    public SampleEntityRepository(ApplicationDbContext context) : base(context)
+    public SampleEntityRepository(ArgoreuseContext context) : base(context)
     {
     }
 

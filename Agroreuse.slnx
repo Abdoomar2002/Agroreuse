@@ -7,4 +7,5 @@
   <Project Path="Agroreuse.Domain/Agroreuse.Domain.csproj" />
   <Project Path="Agroreuse.Infrastructure/Agroreuse.Infrastructure.csproj" />
   <Project Path="Agroreuse.Server/Agroreuse.Server.csproj" />
+  <Project Path="Argoreuse.Presentation/Argoreuse.Presentation.csproj" Id="53046ded-4492-4438-8409-c57b0a616916" />
 </Solution>

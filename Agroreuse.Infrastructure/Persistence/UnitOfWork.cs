@@ -7,9 +7,9 @@ namespace Agroreuse.Infrastructure.Persistence;
 /// </summary>
 public class UnitOfWork : IUnitOfWork
 {
-    private readonly ApplicationDbContext _context;
+    private readonly ArgoreuseContext _context;
 
-    public UnitOfWork(ApplicationDbContext context)
+    public UnitOfWork(ArgoreuseContext context)
     {
         _context = context;
     }

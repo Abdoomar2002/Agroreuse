@@ -1,4 +1,5 @@
 using System.Reflection;
+using Agroreuse.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Agroreuse.Application;
@@ -14,6 +15,8 @@ public static class DependencyInjection
         {
             cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
         });
+
+        services.AddScoped<IJwtTokenService, JwtTokenService>();
 
         return services;
     }
