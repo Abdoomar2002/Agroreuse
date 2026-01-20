@@ -1,8 +1,10 @@
 ﻿using Agroreuse.Application.DTOs.Auth;
 using Agroreuse.Application.Services;
 using Agroreuse.Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace WebUI.Controllers
 {
@@ -11,16 +13,13 @@ namespace WebUI.Controllers
     public class AuthController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IJwtTokenService _jwtTokenService;
 
         public AuthController(
-            UserManager<ApplicationUser> userManager, 
-            SignInManager<ApplicationUser> signInManager,
+            UserManager<ApplicationUser> userManager,
             IJwtTokenService jwtTokenService)
         {
             _userManager = userManager;
-            _signInManager = signInManager;
             _jwtTokenService = jwtTokenService;
         }
 
@@ -53,8 +52,9 @@ namespace WebUI.Controllers
             if (user == null)
                 return Unauthorized();
 
-            var result = await _signInManager.PasswordSignInAsync(user, model.Password, isPersistent: false, lockoutOnFailure: false);
-            if (result.Succeeded)
+            // Use CheckPasswordAsync instead of PasswordSignInAsync for JWT-based auth
+            var isValidPassword = await _userManager.CheckPasswordAsync(user, model.Password);
+            if (isValidPassword)
             {
                 var token = _jwtTokenService.GenerateToken(user);
                 return Ok(new LoginResponseDto
@@ -66,6 +66,31 @@ namespace WebUI.Controllers
             }
 
             return Unauthorized();
+        }
+
+        [HttpGet("me")]
+        [Authorize]
+        public async Task<IActionResult> GetCurrentUser()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return Unauthorized();
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return NotFound();
+
+            return Ok(new UserDto
+            {
+                Id = user.Id,
+                Email = user.Email,
+                FullName = user.FullName,
+                Address = user.Address,
+                PhoneNumber = user.PhoneNumber,
+                Type = user.Type,
+                CreatedAt = user.CreatedAt,
+                IsLocked = user.IsLocked
+            });
         }
     }
 }

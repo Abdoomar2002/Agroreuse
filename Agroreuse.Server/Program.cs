@@ -16,7 +16,19 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
-// Configure JWT
+// Configure Identity first (without default authentication scheme)
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
+    // Configure password rules here
+    options.Password.RequireDigit = true;
+    options.Password.RequiredLength = 6;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+})
+.AddEntityFrameworkStores<ArgoreuseContext>()
+.AddDefaultTokenProviders();
+
+// Configure JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secret = jwtSettings["Secret"];
 var key = Encoding.ASCII.GetBytes(secret);
@@ -25,9 +37,11 @@ builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 })
 .AddJwtBearer(options =>
 {
+    options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuerSigningKey = true,
@@ -41,16 +55,12 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+// Add authorization policies
+builder.Services.AddAuthorization(options =>
 {
-    // Configure password rules here
-    options.Password.RequireDigit = true;
-    options.Password.RequiredLength = 6;
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequireUppercase = false;
-})
-.AddEntityFrameworkStores<ArgoreuseContext>()
-.AddDefaultTokenProviders();
+    options.AddPolicy("AdminOnly", policy => policy.RequireClaim("UserType", "Admin"));
+});
+
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();

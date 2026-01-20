@@ -16,7 +16,14 @@ public static class DependencyInjection
             cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
         });
 
+        // Add Memory Cache for OTP storage
+        services.AddMemoryCache();
+
         services.AddScoped<IJwtTokenService, JwtTokenService>();
+        services.AddScoped<IOtpService, OtpService>();
+        
+        // Register Mock SMS Service (replace with real implementation when ready)
+        services.AddScoped<ISmsService, MockSmsService>();
 
         return services;
     }
