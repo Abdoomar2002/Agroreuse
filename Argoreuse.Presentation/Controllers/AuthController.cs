@@ -1,6 +1,7 @@
 ﻿using Agroreuse.Application.DTOs.Auth;
 using Agroreuse.Application.Services;
 using Agroreuse.Domain.Entities;
+using Agroreuse.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -28,7 +29,7 @@ namespace WebUI.Controllers
         {
             var user = new ApplicationUser
             {
-                UserName = model.Email,
+                UserName = model?.Email??model.PhoneNumber,
                 Email = model.Email,
                 FullName = model.FullName,
                 Address = model.Address,
@@ -45,13 +46,22 @@ namespace WebUI.Controllers
             return BadRequest(result.Errors);
         }
 
-        [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginDto model)
+        [HttpPost("Farmer/login")]
+        public async Task<IActionResult> FarmerLogin([FromBody] FarmerLoginDto model)
         {
-            var user = await _userManager.FindByEmailAsync(model.Email);
+            var user = await _userManager.FindByNameAsync(model.PhoneNumber);
+            
             if (user == null)
-                return Unauthorized();
+                return Unauthorized(new { message = "Invalid phone number or password." });
 
+            // Validate that this user is actually a Farmer
+            if (user.Type != UserType.Farmer)
+                return Unauthorized(new { message = "This account is not registered as a Farmer." });
+
+            // Check if account is locked
+            if (user.IsLocked)
+                return Unauthorized(new { message = "This account has been locked." });
+            
             // Use CheckPasswordAsync instead of PasswordSignInAsync for JWT-based auth
             var isValidPassword = await _userManager.CheckPasswordAsync(user, model.Password);
             if (isValidPassword)
@@ -65,7 +75,38 @@ namespace WebUI.Controllers
                 });
             }
 
-            return Unauthorized();
+            return Unauthorized(new { message = "Invalid phone number or password." });
+        }
+        [HttpPost("Factory/login")]
+        public async Task<IActionResult> FactoryLogin([FromBody] FactoryLoginDto model)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            
+            if (user == null)
+                return Unauthorized(new { message = "Invalid email or password." });
+
+            // Validate that this user is actually a Factory
+            if (user.Type != UserType.Factory)
+                return Unauthorized(new { message = "This account is not registered as a Factory." });
+
+            // Check if account is locked
+            if (user.IsLocked)
+                return Unauthorized(new { message = "This account has been locked." });
+            
+            // Use CheckPasswordAsync instead of PasswordSignInAsync for JWT-based auth
+            var isValidPassword = await _userManager.CheckPasswordAsync(user, model.Password);
+            if (isValidPassword)
+            {
+                var token = _jwtTokenService.GenerateToken(user);
+                return Ok(new LoginResponseDto
+                {
+                    Token = token,
+                    Email = user.Email,
+                    FullName = user.FullName
+                });
+            }
+
+            return Unauthorized(new { message = "Invalid email or password." });
         }
 
         [HttpGet("me")]

@@ -30,7 +30,7 @@ namespace Agroreuse.Application.Services
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Email, user?.Email??user.PhoneNumber),
                 new Claim(ClaimTypes.Name, user.FullName),
                 new Claim("UserType", user.Type.ToString())
             };

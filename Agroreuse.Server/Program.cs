@@ -59,6 +59,8 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOnly", policy => policy.RequireClaim("UserType", "Admin"));
+    options.AddPolicy("Farmer", policy => policy.RequireClaim("UserType", "Farmer"));
+    options.AddPolicy("Factory", policy => policy.RequireClaim("UserType", "Factory"));
 });
 
 builder.Services.AddControllers();
