@@ -46,48 +46,24 @@ namespace WebUI.Controllers
             return BadRequest(result.Errors);
         }
 
-        [HttpPost("Farmer/login")]
-        public async Task<IActionResult> FarmerLogin([FromBody] FarmerLoginDto model)
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] GeneralLoginDto model)
         {
-            var user = await _userManager.FindByNameAsync(model.PhoneNumber);
-            
-            if (user == null)
-                return Unauthorized(new { message = "Invalid phone number or password." });
-
-            // Validate that this user is actually a Farmer
-            if (user.Type != UserType.Farmer)
-                return Unauthorized(new { message = "This account is not registered as a Farmer." });
-
-            // Check if account is locked
-            if (user.IsLocked)
-                return Unauthorized(new { message = "This account has been locked." });
-            
-            // Use CheckPasswordAsync instead of PasswordSignInAsync for JWT-based auth
-            var isValidPassword = await _userManager.CheckPasswordAsync(user, model.Password);
-            if (isValidPassword)
+            var user = null as ApplicationUser;
+            if (model == null || (string.IsNullOrEmpty(model.Email) &&string.IsNullOrEmpty(model.Phone))|| string.IsNullOrEmpty(model.Password))
+                return BadRequest(new { message = "(Email or phone) and password are required." });
+            if(!string.IsNullOrEmpty(model.Email))
             {
-                var token = _jwtTokenService.GenerateToken(user);
-                return Ok(new LoginResponseDto
-                {
-                    Token = token,
-                    Email = user.Email,
-                    FullName = user.FullName
-                });
+            user = await _userManager.FindByEmailAsync(model.Email);
+                if(user!=null&& user.Type!=model.UserType)
+                    user = null;
             }
+            else if(!string.IsNullOrEmpty(model.Phone))
+                user = _userManager.Users.FirstOrDefault(u => u.PhoneNumber == model.Phone&&model.UserType==u.Type);
 
-            return Unauthorized(new { message = "Invalid phone number or password." });
-        }
-        [HttpPost("Factory/login")]
-        public async Task<IActionResult> FactoryLogin([FromBody] FactoryLoginDto model)
-        {
-            var user = await _userManager.FindByEmailAsync(model.Email);
-            
             if (user == null)
                 return Unauthorized(new { message = "Invalid email or password." });
-
-            // Validate that this user is actually a Factory
-            if (user.Type != UserType.Factory)
-                return Unauthorized(new { message = "This account is not registered as a Factory." });
 
             // Check if account is locked
             if (user.IsLocked)

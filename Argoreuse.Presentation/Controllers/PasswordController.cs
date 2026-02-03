@@ -34,46 +34,50 @@ namespace WebUI.Controllers
         [HttpPost("forgot")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDto request)
         {
-            var user = await _userManager.FindByEmailAsync(request.Email);
-            
-            // Don't reveal if user exists or not for security
-            if (user == null)
+            var user =null as ApplicationUser;
+            if (string.IsNullOrEmpty(request.Email)&&string.IsNullOrEmpty(request.Phone))
             {
-                return Ok(new ForgotPasswordResponseDto
+                return BadRequest("You must enter Email or Phone number");
+            }
+            if(!string.IsNullOrEmpty(request.Email))
+            user = await _userManager.FindByEmailAsync(request.Email);
+            else if(!string.IsNullOrEmpty(request.Phone))
+                user = await _userManager.FindByNameAsync(request.Phone);
+            // Don't reveal if user exists or not for security
+            if (user == null || user.Type != request.Type)
+            {
+                return StatusCode(403,new ForgotPasswordResponseDto
                 {
                     Success = true,
-                    Message = "If an account with this email exists, an OTP has been sent to the registered phone number."
+                    Message = "Failed to find an account with this credentail"
                 });
             }
-
-            if (string.IsNullOrEmpty(user.PhoneNumber))
-            {
-                return BadRequest(new ForgotPasswordResponseDto
-                {
-                    Success = false,
-                    Message = "No phone number registered for this account."
-                });
-            }
-
+            string otp="";
             // Generate OTP
-            var otp = _otpService.GenerateOtp(request.Email);
+            if (user.Type==Agroreuse.Domain.Enums.UserType.Factory)
+            otp = _otpService.GenerateOtp(request.Email);
+            else if(user.Type==Agroreuse.Domain.Enums.UserType.Farmer)
+             otp = _otpService.GenerateOtp(request.Phone);
+            
+                // Send OTP via SMS
+                var smsMessage = $"Your Agroreuse password reset OTP is: {otp}. Valid for 5 minutes.";
+            if(user.Type==Agroreuse.Domain.Enums.UserType.Factory)
+                await _smsService.SendSmsAsync(user.Email, smsMessage);
+            else if(user.Type==Agroreuse.Domain.Enums.UserType.Farmer)
+                await _smsService.SendSmsAsync(user.PhoneNumber, smsMessage);
 
-            // Send OTP via SMS
-            var smsMessage = $"Your Agroreuse password reset OTP is: {otp}. Valid for 5 minutes.";
-            await _smsService.SendSmsAsync(user.PhoneNumber, smsMessage);
-
+            var target = user.Type==Agroreuse.Domain.Enums.UserType.Factory ? "email" : "phone number";
             var response = new ForgotPasswordResponseDto
             {
                 Success = true,
-                Message = "OTP has been sent to your registered phone number."
+                Message = $"OTP has been sent to your registered {target}"
             };
 
             // Include OTP in response only in development mode for testing
-            if (_environment.IsDevelopment())
-            {
+           
                 response.DebugOtp = otp;
                 response.Message += " (Debug: OTP included in response for testing)";
-            }
+           
 
             return Ok(response);
         }
@@ -84,8 +88,23 @@ namespace WebUI.Controllers
         [HttpPost("verify-otp")]
         public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpRequestDto request)
         {
-            var user = await _userManager.FindByEmailAsync(request.Email);
-            if (user == null)
+            if(string.IsNullOrEmpty(request.Email)&& string.IsNullOrEmpty(request.Phone))
+            {
+                return BadRequest(new VerifyOtpResponseDto
+                {
+                    Success = false,
+                    Message = "Email or phone are required."
+                });
+            }
+            var user = null as ApplicationUser;
+            if(request.Email!=null) {
+            user = await _userManager.FindByEmailAsync(request.Email);
+                }
+            else if(request.Phone!=null)
+            {
+                user = await _userManager.FindByNameAsync(request.Phone);
+            }
+            if (user == null || user.Type != request.Type)
             {
                 return BadRequest(new VerifyOtpResponseDto
                 {
@@ -93,9 +112,18 @@ namespace WebUI.Controllers
                     Message = "Invalid request."
                 });
             }
-
+            bool isValidOtp = false;
+            if(user.Type==Agroreuse.Domain.Enums.UserType.Factory)
+            {
+                // Validate OTP for email
+                isValidOtp = _otpService.ValidateOtp(request.Email, request.Otp);
+            }
+            else if(user.Type==Agroreuse.Domain.Enums.UserType.Farmer)
+            {
+                // Validate OTP for phone
+                isValidOtp = _otpService.ValidateOtp(request.Phone, request.Otp);
+            }
             // Validate OTP
-            var isValidOtp = _otpService.ValidateOtp(request.Email, request.Otp);
             if (!isValidOtp)
             {
                 return BadRequest(new VerifyOtpResponseDto
@@ -106,7 +134,10 @@ namespace WebUI.Controllers
             }
 
             // Invalidate OTP after successful verification
-            _otpService.InvalidateOtp(request.Email);
+           if(user.Type==Agroreuse.Domain.Enums.UserType.Factory)
+                _otpService.InvalidateOtp(request.Email);
+              else if(user.Type==Agroreuse.Domain.Enums.UserType.Farmer)
+                _otpService.InvalidateOtp(request.Phone);
 
             // Generate password reset token
             var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
@@ -125,8 +156,19 @@ namespace WebUI.Controllers
         [HttpPost("reset")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDto request)
         {
-            var user = await _userManager.FindByEmailAsync(request.Email);
-            if (user == null)
+            //validate request
+            if(string.IsNullOrEmpty(request.Email)&&string.IsNullOrEmpty(request.Phone))
+            {
+                return BadRequest(new { Success = false, Message = "Email or Phone are required." });
+            }
+            var user = null as ApplicationUser;
+            if(request.Email!=null)
+             user = await _userManager.FindByEmailAsync(request.Email);
+            else if(request.Phone!=null)
+             user = await _userManager.FindByNameAsync(request.Phone);
+
+
+            if (user == null||user.Type!=request.Type)
             {
                 return BadRequest(new { Success = false, Message = "Invalid request." });
             }
