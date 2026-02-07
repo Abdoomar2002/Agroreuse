@@ -1,10 +1,13 @@
-﻿using Agroreuse.Application.DTOs.Auth;
+﻿using Agroreuse.Application.DTOs;
+using Agroreuse.Application.DTOs.Auth;
 using Agroreuse.Application.Services;
 using Agroreuse.Domain.Entities;
 using Agroreuse.Domain.Enums;
+using Agroreuse.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace WebUI.Controllers
@@ -15,13 +18,16 @@ namespace WebUI.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IJwtTokenService _jwtTokenService;
+        private readonly ArgoreuseContext _context;
 
         public AuthController(
             UserManager<ApplicationUser> userManager,
-            IJwtTokenService jwtTokenService)
+            IJwtTokenService jwtTokenService,
+            ArgoreuseContext context)
         {
             _userManager = userManager;
             _jwtTokenService = jwtTokenService;
+            _context = context;
         }
 
         [HttpPost("register")]
@@ -97,6 +103,26 @@ namespace WebUI.Controllers
             if (user == null)
                 return NotFound();
 
+            // Load address details if exists
+            var address = await _context.Addresses
+                .Include(a => a.Government)
+                .Include(a => a.City)
+                .FirstOrDefaultAsync(a => a.ApplicationUserId == userId);
+
+            AddressDto? addressDto = null;
+            if (address != null)
+            {
+                addressDto = new AddressDto
+                {
+                    Id = address.Id,
+                    GovernmentId = address.GovernmentId,
+                    GovernmentName = address.Government.Name,
+                    CityId = address.CityId,
+                    CityName = address.City.Name,
+                    Details = address.Details
+                };
+            }
+
             return Ok(new UserDto
             {
                 Id = user.Id,
@@ -106,7 +132,9 @@ namespace WebUI.Controllers
                 PhoneNumber = user.PhoneNumber,
                 Type = user.Type,
                 CreatedAt = user.CreatedAt,
-                IsLocked = user.IsLocked
+                IsLocked = user.IsLocked,
+                ImagePath = user.ImagePath,
+                AddressDetails = addressDto
             });
         }
     }

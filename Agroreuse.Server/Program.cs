@@ -77,6 +77,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.UseDefaultFiles();
+app.UseStaticFiles(); // Enable serving static files from wwwroot (including uploaded images)
 app.MapStaticAssets();
 
 // Configure the HTTP request pipeline.

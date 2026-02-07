@@ -1,6 +1,8 @@
+using Agroreuse.Application.Services;
 using Agroreuse.Domain.Repositories;
 using Agroreuse.Infrastructure.Persistence;
 using Agroreuse.Infrastructure.Persistence.Repositories;
+using Agroreuse.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,6 +28,9 @@ public static class DependencyInjection
 
         // Register specific repositories
         services.AddScoped<ISampleEntityRepository, SampleEntityRepository>();
+
+        // Register file upload service
+        services.AddScoped<IFileUploadService, FileUploadService>();
 
         return services;
     }

@@ -1,6 +1,7 @@
 using Agroreuse.Application.DTOs.Auth;
 using Agroreuse.Application.Services;
 using Agroreuse.Domain.Entities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
@@ -131,6 +132,7 @@ namespace WebUI.Controllers
                     Success = false,
                     Message = "Invalid or expired OTP."
                 });
+               
             }
 
             // Invalidate OTP after successful verification

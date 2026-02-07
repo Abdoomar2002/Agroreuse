@@ -1,3 +1,4 @@
+using Agroreuse.Application.DTOs;
 using Agroreuse.Domain.Enums;
 
 namespace Agroreuse.Application.DTOs.Auth
@@ -12,5 +13,7 @@ namespace Agroreuse.Application.DTOs.Auth
         public UserType Type { get; set; }
         public DateTime CreatedAt { get; set; }
         public bool IsLocked { get; set; }
+        public string? ImagePath { get; set; }
+        public AddressDto? AddressDetails { get; set; }
     }
 }
