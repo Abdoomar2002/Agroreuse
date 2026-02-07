@@ -1,0 +1,67 @@
+<div class="dashboard-layout">
+  <!-- Right Side Panel -->
+  <aside class="side-panel">
+    <div class="panel-logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h1>Agroreuse</h1>
+    </div>
+
+    <nav class="panel-nav">
+      <button class="nav-button" [class.active]="currentView === 'users'" (click)="navigateTo('users')">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M17 21V19C17 16.79 15.21 15 13 15H5C2.79 15 1 16.79 1 19V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"/><path d="M23 21V19C23 17.35 21.96 15.93 20.5 15.39" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.39C17.96 3.93 19 5.35 19 7C19 8.65 17.96 10.07 16.5 10.61" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span>المستخدمون</span>
+      </button>
+      <button class="nav-button" [class.active]="currentView === 'governments'" (click)="navigateTo('governments')">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M3 21H21M5 21V7L13 3V21M13 21H19V11L13 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>المحافظات والمدن</span>
+      </button>
+      <button class="nav-button" [class.active]="currentView === 'contact'" (click)="navigateTo('contact')">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M21 15C21 15.53 20.79 16.04 20.41 16.41C20.04 16.79 19.53 17 19 17H7L3 21V5C3 4.47 3.21 3.96 3.59 3.59C3.96 3.21 4.47 3 5 3H19C19.53 3 20.04 3.21 20.41 3.59C20.79 3.96 21 4.47 21 5V15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>تواصل معنا</span>
+      </button>
+    </nav>
+
+    <button class="logout-button" (click)="logout()">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M9 21H5C4.47 21 3.96 20.79 3.59 20.41C3.21 20.04 3 19.53 3 19V5C3 4.47 3.21 3.96 3.59 3.59C3.96 3.21 4.47 3 5 3H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 17L21 12L16 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>تسجيل الخروج</span>
+    </button>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <header class="content-header">
+      <div class="header-left">
+        <h2 *ngIf="currentView === 'users'">المستخدمون</h2>
+        <h2 *ngIf="currentView === 'governments'">المحافظات والمدن</h2>
+        <h2 *ngIf="currentView === 'contact'">رسائل التواصل</h2>
+      </div>
+      <div class="header-right">
+        <div class="user-profile">
+          <div class="avatar">{{ currentUser?.firstName?.charAt(0) }}{{ currentUser?.lastName?.charAt(0) }}</div>
+          <div class="profile-info">
+            <p class="name">{{ currentUser?.firstName }} {{ currentUser?.lastName }}</p>
+            <p class="role">مسؤول</p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <div *ngIf="currentView === 'users'" class="view-container">
+        <app-users-management></app-users-management>
+      </div>
+      <div *ngIf="currentView === 'governments'" class="view-container">
+        <app-governments></app-governments>
+      </div>
+      <div *ngIf="currentView === 'contact'" class="view-container">
+        <app-contact-messages></app-contact-messages>
+      </div>
+    </div>
+  </main>
+</div>

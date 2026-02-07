@@ -1,0 +1,140 @@
+<div class="contact-page">
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>جاري التحميل...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && !loading" class="error-state">
+    <p>{{ error }}</p>
+    <button (click)="loadMessages()">حاول مرة أخرى</button>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!loading && !error" class="contact-content">
+    <!-- Analytics Cards -->
+    <div class="analytics-row">
+      <div class="analytics-card total">
+        <div class="analytics-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M21 15C21 15.53 20.79 16.04 20.41 16.41C20.04 16.79 19.53 17 19 17H7L3 21V5C3 4.47 3.21 3.96 3.59 3.59C3.96 3.21 4.47 3 5 3H19C19.53 3 20.04 3.21 20.41 3.59C20.79 3.96 21 4.47 21 5V15Z" stroke="currentColor" stroke-width="2"/></svg></div>
+        <div class="analytics-info"><span class="analytics-value">{{ totalCount }}</span><span class="analytics-label">إجمالي الرسائل</span></div>
+      </div>
+      <div class="analytics-card answered">
+        <div class="analytics-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="analytics-info"><span class="analytics-value">{{ answeredCount }}</span><span class="analytics-label">تم الرد عليها</span></div>
+      </div>
+      <div class="analytics-card unanswered">
+        <div class="analytics-icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 8V12M12 16H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <div class="analytics-info"><span class="analytics-value">{{ unansweredCount }}</span><span class="analytics-label">بانتظار الرد</span></div>
+      </div>
+      <div class="analytics-card rate">
+        <div class="analytics-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="analytics-info"><span class="analytics-value">{{ answerRate }}%</span><span class="analytics-label">نسبة الرد</span></div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-bar">
+      <div class="filter-group">
+        <label>الحالة:</label>
+        <select [(ngModel)]="filterStatus" (ngModelChange)="onFilterChange()">
+          <option value="all">الكل</option>
+          <option value="answered">تم الرد</option>
+          <option value="unanswered">بانتظار الرد</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>نوع المستخدم:</label>
+        <select [(ngModel)]="filterUserType" (ngModelChange)="onFilterChange()">
+          <option value="all">الكل</option>
+          <option [ngValue]="0">مزارع</option>
+          <option [ngValue]="1">مصنع</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>نوع الرسالة:</label>
+        <select [(ngModel)]="filterContactType" (ngModelChange)="onFilterChange()">
+          <option value="all">الكل</option>
+          <option [ngValue]="0">عام</option>
+          <option [ngValue]="1">مشكلة</option>
+          <option [ngValue]="2">اقتراح</option>
+          <option [ngValue]="3">شكوى</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>من:</label>
+        <input type="date" [(ngModel)]="filterDateFrom" (ngModelChange)="onFilterChange()">
+      </div>
+      <div class="filter-group">
+        <label>إلى:</label>
+        <input type="date" [(ngModel)]="filterDateTo" (ngModelChange)="onFilterChange()">
+      </div>
+      <button class="clear-btn" (click)="clearFilters()">مسح الفلاتر</button>
+      <span class="results-count">{{ filteredMessages.length }} نتيجة</span>
+    </div>
+
+    <!-- Messages Table -->
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>المرسل</th>
+            <th>البريد</th>
+            <th>نوع المستخدم</th>
+            <th>نوع الرسالة</th>
+            <th>الرسالة</th>
+            <th>التاريخ</th>
+            <th>الحالة</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="filteredMessages.length === 0">
+            <td colspan="8" class="empty-row">لا توجد رسائل</td>
+          </tr>
+          <tr *ngFor="let msg of filteredMessages; let i = index" 
+              [class.selected]="selectedMessage?.id === msg.id" 
+              (click)="selectMessage(msg)">
+            <td class="row-num">{{ i + 1 }}</td>
+            <td class="name-cell">{{ msg.userName }}</td>
+            <td>{{ msg.userEmail }}</td>
+            <td><span class="type-badge user">{{ getUserTypeLabel(msg.userType) }}</span></td>
+            <td><span class="type-badge contact">{{ getContactTypeLabel(msg.contactType) }}</span></td>
+            <td class="message-cell">{{ msg.message }}</td>
+            <td class="date-cell">{{ formatDate(msg.submittedAt) }}</td>
+            <td>
+              <span class="status-badge" [class.answered]="msg.adminResponse" [class.pending]="!msg.adminResponse">
+                {{ msg.adminResponse ? 'تم الرد' : 'بانتظار' }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Selected Message Detail -->
+    <div class="message-detail" *ngIf="selectedMessage">
+      <div class="detail-header">
+        <h3>تفاصيل الرسالة</h3>
+        <button class="close-btn" (click)="selectedMessage = null">×</button>
+      </div>
+      <div class="detail-grid">
+        <div class="detail-item"><span class="label">المرسل:</span><span>{{ selectedMessage.userName }}</span></div>
+        <div class="detail-item"><span class="label">البريد:</span><span>{{ selectedMessage.userEmail }}</span></div>
+        <div class="detail-item" *ngIf="selectedMessage.userPhone"><span class="label">الهاتف:</span><span>{{ selectedMessage.userPhone }}</span></div>
+        <div class="detail-item"><span class="label">نوع المستخدم:</span><span>{{ getUserTypeLabel(selectedMessage.userType) }}</span></div>
+        <div class="detail-item"><span class="label">نوع الرسالة:</span><span>{{ getContactTypeLabel(selectedMessage.contactType) }}</span></div>
+        <div class="detail-item"><span class="label">التاريخ:</span><span>{{ formatDate(selectedMessage.submittedAt) }}</span></div>
+      </div>
+      <div class="detail-message">
+        <span class="label">الرسالة:</span>
+        <p>{{ selectedMessage.message }}</p>
+      </div>
+      <div class="detail-response" *ngIf="selectedMessage.adminResponse">
+        <span class="label">الرد:</span>
+        <p>{{ selectedMessage.adminResponse }}</p>
+        <span class="response-date" *ngIf="selectedMessage.respondedAt">{{ formatDate(selectedMessage.respondedAt) }}</span>
+      </div>
+    </div>
+  </div>
+</div>

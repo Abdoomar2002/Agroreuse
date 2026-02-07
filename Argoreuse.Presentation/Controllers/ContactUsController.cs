@@ -90,13 +90,13 @@ Message ID: {contactMessage.Id}
                 Data = new ContactUsDto
                 {
                     Id = contactMessage.Id,
-                    UserId = contactMessage.UserId,
-                    UserName = contactMessage.UserName,
-                    UserEmail = contactMessage.UserEmail,
+                    UserId = contactMessage.UserId ?? "",
+                    UserName = contactMessage.UserName ?? "",
+                    UserEmail = contactMessage.UserEmail ?? "",
                     UserPhone = contactMessage.UserPhone,
                     UserType = contactMessage.UserType,
                     ContactType = contactMessage.ContactType,
-                    Message = contactMessage.Message,
+                    Message = contactMessage.Message ?? "",
                     SubmittedAt = contactMessage.SubmittedAt,
                     IsRead = contactMessage.IsRead
                 }
@@ -116,19 +116,19 @@ Message ID: {contactMessage.Id}
             {
                 query = query.Where(m => m.IsRead == isRead.Value);
             }
+            if(!query.Any())return Ok(new List<ContactUsDto>());
 
             var messages = await query
-                .OrderByDescending(m => m.SubmittedAt)
                 .Select(m => new ContactUsDto
                 {
                     Id = m.Id,
-                    UserId = m.UserId,
-                    UserName = m.UserName,
-                    UserEmail = m.UserEmail,
+                    UserId = m.UserId ?? "",
+                    UserName = m.UserName ?? "",
+                    UserEmail = m.UserEmail ?? "",
                     UserPhone = m.UserPhone,
                     UserType = m.UserType,
                     ContactType = m.ContactType,
-                    Message = m.Message,
+                    Message = m.Message ?? "",
                     SubmittedAt = m.SubmittedAt,
                     IsRead = m.IsRead,
                     AdminResponse = m.AdminResponse,
@@ -136,7 +136,7 @@ Message ID: {contactMessage.Id}
                 })
                 .ToListAsync();
 
-            return Ok(messages);
+            return Ok(messages.OrderByDescending(z=>z.SubmittedAt));
         }
 
         /// <summary>
@@ -154,13 +154,13 @@ Message ID: {contactMessage.Id}
             return Ok(new ContactUsDto
             {
                 Id = message.Id,
-                UserId = message.UserId,
-                UserName = message.UserName,
-                UserEmail = message.UserEmail,
+                UserId = message.UserId ?? "",
+                UserName = message.UserName ?? "",
+                UserEmail = message.UserEmail ?? "",
                 UserPhone = message.UserPhone,
                 UserType = message.UserType,
                 ContactType = message.ContactType,
-                Message = message.Message,
+                Message = message.Message ?? "",
                 SubmittedAt = message.SubmittedAt,
                 IsRead = message.IsRead,
                 AdminResponse = message.AdminResponse,
@@ -232,13 +232,13 @@ Agroreuse Team
                 Data = new ContactUsDto
                 {
                     Id = message.Id,
-                    UserId = message.UserId,
-                    UserName = message.UserName,
-                    UserEmail = message.UserEmail,
+                    UserId = message.UserId ?? "",
+                    UserName = message.UserName ?? "",
+                    UserEmail = message.UserEmail ?? "",
                     UserPhone = message.UserPhone,
                     UserType = message.UserType,
                     ContactType = message.ContactType,
-                    Message = message.Message,
+                    Message = message.Message ?? "",
                     SubmittedAt = message.SubmittedAt,
                     IsRead = message.IsRead,
                     AdminResponse = message.AdminResponse,
@@ -264,13 +264,13 @@ Agroreuse Team
                 .Select(m => new ContactUsDto
                 {
                     Id = m.Id,
-                    UserId = m.UserId,
-                    UserName = m.UserName,
-                    UserEmail = m.UserEmail,
+                    UserId = m.UserId ?? "",
+                    UserName = m.UserName ?? "",
+                    UserEmail = m.UserEmail ?? "",
                     UserPhone = m.UserPhone,
                     UserType = m.UserType,
                     ContactType = m.ContactType,
-                    Message = m.Message,
+                    Message = m.Message ?? "",
                     SubmittedAt = m.SubmittedAt,
                     IsRead = m.IsRead,
                     AdminResponse = m.AdminResponse,

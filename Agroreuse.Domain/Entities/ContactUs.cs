@@ -11,17 +11,17 @@ namespace Agroreuse.Domain.Entities
         /// <summary>
         /// User ID who submitted the contact form
         /// </summary>
-        public string UserId { get; set; }
+        public string? UserId { get; set; }
 
         /// <summary>
         /// User's full name
         /// </summary>
-        public string UserName { get; set; }
+        public string? UserName { get; set; }
 
         /// <summary>
         /// User's email
         /// </summary>
-        public string UserEmail { get; set; }
+        public string? UserEmail { get; set; }
 
         /// <summary>
         /// User's phone number
@@ -41,7 +41,7 @@ namespace Agroreuse.Domain.Entities
         /// <summary>
         /// Message body
         /// </summary>
-        public string Message { get; set; }
+        public string? Message { get; set; }
 
         /// <summary>
         /// When the message was submitted

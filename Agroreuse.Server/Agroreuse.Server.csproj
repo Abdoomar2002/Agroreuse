@@ -31,4 +31,8 @@
     <ProjectReference Include="..\Argoreuse.Presentation\Argoreuse.Presentation.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\admin\js\" />
+  </ItemGroup>
+
 </Project>

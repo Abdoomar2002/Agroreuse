@@ -1,0 +1,153 @@
+<div class="governments-page">
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>جاري التحميل...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && !loading" class="error-state">
+    <p>{{ error }}</p>
+    <button (click)="loadGovernments()">حاول مرة أخرى</button>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!loading && !error" class="governments-content">
+    <!-- Header -->
+    <div class="page-header">
+      <div class="header-info">
+        <span class="count">{{ governments.length }} محافظة</span>
+      </div>
+      <button class="add-btn" (click)="showAddGovForm = true" *ngIf="!showAddGovForm">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        إضافة محافظة
+      </button>
+    </div>
+
+    <!-- Add Government Form -->
+    <div class="add-form" *ngIf="showAddGovForm">
+      <input type="text" placeholder="اسم المحافظة" [(ngModel)]="newGovName" (keyup.enter)="addGovernment()">
+      <button class="save-btn" (click)="addGovernment()">حفظ</button>
+      <button class="cancel-btn" (click)="showAddGovForm = false; newGovName = ''">إلغاء</button>
+    </div>
+
+    <!-- Governments Table -->
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>اسم المحافظة</th>
+            <th>عدد المدن</th>
+            <th>الإجراءات</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="governments.length === 0">
+            <td colspan="4" class="empty-row">لا توجد محافظات</td>
+          </tr>
+          <tr *ngFor="let gov of governments; let i = index">
+            <td class="row-num">{{ i + 1 }}</td>
+            <td class="name-cell">
+              <span *ngIf="editingGovId !== gov.id">{{ gov.name }}</span>
+              <input *ngIf="editingGovId === gov.id" type="text" [(ngModel)]="editGovName" (keyup.enter)="saveEditGov(gov)" class="edit-input">
+            </td>
+            <td>
+              <span class="city-count">{{ gov.cities?.length || 0 }}</span>
+            </td>
+            <td class="actions-cell">
+              <ng-container *ngIf="editingGovId !== gov.id">
+                <button class="action-btn cities" (click)="openCityModal(gov)" title="إدارة المدن">
+                  <svg viewBox="0 0 24 24" fill="none"><path d="M21 10C21 17 12 23 12 23S3 17 3 10C3 5.58 7.03 2 12 2S21 5.58 21 10Z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="2"/></svg>
+                </button>
+                <button class="action-btn edit" (click)="startEditGov(gov)" title="تعديل">
+                  <svg viewBox="0 0 24 24" fill="none"><path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M18.5 2.50001C18.8978 2.10219 19.4374 1.87869 20 1.87869C20.5626 1.87869 21.1022 2.10219 21.5 2.50001C21.8978 2.89784 22.1213 3.4374 22.1213 4.00001C22.1213 4.56262 21.8978 5.10219 21.5 5.50001L12 15L8 16L9 12L18.5 2.50001Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <button class="action-btn delete" (click)="deleteGovernment(gov)" title="حذف">
+                  <svg viewBox="0 0 24 24" fill="none"><path d="M3 6H5H21M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+              </ng-container>
+              <ng-container *ngIf="editingGovId === gov.id">
+                <button class="action-btn save" (click)="saveEditGov(gov)" title="حفظ">
+                  <svg viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <button class="action-btn cancel" (click)="cancelEditGov()" title="إلغاء">
+                  <svg viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+              </ng-container>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- City Modal -->
+<div class="modal-overlay" *ngIf="showCityModal" (click)="closeCityModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>مدن محافظة {{ selectedGovernment?.name }}</h3>
+      <button class="close-btn" (click)="closeCityModal()">×</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Add City -->
+      <div class="modal-actions">
+        <button class="add-btn" (click)="showAddCityForm = true" *ngIf="!showAddCityForm">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          إضافة مدينة
+        </button>
+      </div>
+
+      <div class="add-form" *ngIf="showAddCityForm">
+        <input type="text" placeholder="اسم المدينة" [(ngModel)]="newCityName" (keyup.enter)="addCity()">
+        <button class="save-btn" (click)="addCity()" [disabled]="cityModalLoading">حفظ</button>
+        <button class="cancel-btn" (click)="showAddCityForm = false; newCityName = ''">إلغاء</button>
+      </div>
+
+      <!-- Cities Table -->
+      <div class="table-container">
+        <table class="data-table cities-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>اسم المدينة</th>
+              <th>الإجراءات</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="!selectedGovernment?.cities?.length">
+              <td colspan="3" class="empty-row">لا توجد مدن</td>
+            </tr>
+            <tr *ngFor="let city of selectedGovernment?.cities; let i = index">
+              <td class="row-num">{{ i + 1 }}</td>
+              <td class="name-cell">
+                <span *ngIf="editingCityId !== city.id">{{ city.name }}</span>
+                <input *ngIf="editingCityId === city.id" type="text" [(ngModel)]="editCityName" (keyup.enter)="saveEditCity(city)" class="edit-input">
+              </td>
+              <td class="actions-cell">
+                <ng-container *ngIf="editingCityId !== city.id">
+                  <button class="action-btn edit" (click)="startEditCity(city)" title="تعديل">
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M18.5 2.50001C18.8978 2.10219 19.4374 1.87869 20 1.87869C20.5626 1.87869 21.1022 2.10219 21.5 2.50001C21.8978 2.89784 22.1213 3.4374 22.1213 4.00001C22.1213 4.56262 21.8978 5.10219 21.5 5.50001L12 15L8 16L9 12L18.5 2.50001Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                  <button class="action-btn delete" (click)="deleteCity(city)" title="حذف">
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M3 6H5H21M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                </ng-container>
+                <ng-container *ngIf="editingCityId === city.id">
+                  <button class="action-btn save" (click)="saveEditCity(city)" [disabled]="cityModalLoading" title="حفظ">
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                  <button class="action-btn cancel" (click)="cancelEditCity()" title="إلغاء">
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                </ng-container>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
