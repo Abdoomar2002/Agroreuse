@@ -16,6 +16,7 @@ namespace Agroreuse.Infrastructure.Persistence
         public DbSet<Government> Governments { get; set; }
         public DbSet<City> Cities { get; set; }
         public DbSet<Address> Addresses { get; set; }
+        public DbSet<ContactUs> ContactUsMessages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -68,6 +69,20 @@ namespace Agroreuse.Infrastructure.Persistence
                     .WithOne(u => u.AddressNavigation)
                     .HasForeignKey<Address>(e => e.ApplicationUserId)
                     .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // Configure ContactUs
+            modelBuilder.Entity<ContactUs>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.UserId).IsRequired().HasMaxLength(450);
+                entity.Property(e => e.UserName).IsRequired().HasMaxLength(200);
+                entity.Property(e => e.UserEmail).HasMaxLength(200);
+                entity.Property(e => e.UserPhone).HasMaxLength(50);
+                entity.Property(e => e.Message).IsRequired().HasMaxLength(2000);
+                entity.Property(e => e.AdminResponse).HasMaxLength(2000);
+                entity.Property(e => e.SubmittedAt).IsRequired();
+                entity.Property(e => e.IsRead).IsRequired();
             });
         }
 

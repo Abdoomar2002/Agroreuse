@@ -32,6 +32,9 @@ public static class DependencyInjection
         // Register file upload service
         services.AddScoped<IFileUploadService, FileUploadService>();
 
+        // Register email service (mock for now)
+        services.AddScoped<IEmailService, MockEmailService>();
+
         return services;
     }
 }
