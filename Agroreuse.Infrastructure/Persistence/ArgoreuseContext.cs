@@ -17,6 +17,8 @@ namespace Agroreuse.Infrastructure.Persistence
         public DbSet<City> Cities { get; set; }
         public DbSet<Address> Addresses { get; set; }
         public DbSet<ContactUs> ContactUsMessages { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderImage> OrderImages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -83,6 +85,44 @@ namespace Agroreuse.Infrastructure.Persistence
                 entity.Property(e => e.AdminResponse).HasMaxLength(2000);
                 entity.Property(e => e.SubmittedAt).IsRequired();
                 entity.Property(e => e.IsRead).IsRequired();
+            });
+
+            // Configure Order
+            modelBuilder.Entity<Order>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.SellerId).IsRequired().HasMaxLength(450);
+                entity.Property(e => e.Quantity).IsRequired();
+                entity.Property(e => e.NumberOfDays).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.Status).IsRequired();
+                entity.Property(e => e.CreatedAt).IsRequired();
+
+                entity.HasOne(e => e.Seller)
+                    .WithMany()
+                    .HasForeignKey(e => e.SellerId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.Address)
+                    .WithMany()
+                    .HasForeignKey(e => e.AddressId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.Category)
+                    .WithMany()
+                    .HasForeignKey(e => e.CategoryId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasMany(e => e.Images)
+                    .WithOne(i => i.Order)
+                    .HasForeignKey(i => i.OrderId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // Configure OrderImage
+            modelBuilder.Entity<OrderImage>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.ImagePath).IsRequired().HasMaxLength(500);
             });
         }
 

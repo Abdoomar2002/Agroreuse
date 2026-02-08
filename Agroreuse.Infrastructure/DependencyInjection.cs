@@ -28,6 +28,8 @@ public static class DependencyInjection
 
         // Register specific repositories
         services.AddScoped<ISampleEntityRepository, SampleEntityRepository>();
+        services.AddScoped<IOrderRepository, OrderRepository>();
+        services.AddScoped<IAddressRepository, AddressRepository>();
 
         // Register file upload service
         services.AddScoped<IFileUploadService, FileUploadService>();
