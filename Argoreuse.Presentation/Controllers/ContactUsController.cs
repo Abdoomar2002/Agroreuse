@@ -116,27 +116,27 @@ Message ID: {contactMessage.Id}
             {
                 query = query.Where(m => m.IsRead == isRead.Value);
             }
-            if(!query.Any())return Ok(new List<ContactUsDto>());
 
-            var messages = await query
-                .Select(m => new ContactUsDto
-                {
-                    Id = m.Id,
-                    UserId = m.UserId ?? "",
-                    UserName = m.UserName ?? "",
-                    UserEmail = m.UserEmail ?? "",
-                    UserPhone = m.UserPhone,
-                    UserType = m.UserType,
-                    ContactType = m.ContactType,
-                    Message = m.Message ?? "",
-                    SubmittedAt = m.SubmittedAt,
-                    IsRead = m.IsRead,
-                    AdminResponse = m.AdminResponse,
-                    RespondedAt = m.RespondedAt
-                })
-                .ToListAsync();
+            // Fetch raw entities first, then project to DTO in memory to handle NULLs
+            var rawMessages = await query.OrderByDescending(m => m.SubmittedAt).ToListAsync();
 
-            return Ok(messages.OrderByDescending(z=>z.SubmittedAt));
+            var messages = rawMessages.Select(m => new ContactUsDto
+            {
+                Id = m.Id,
+                UserId = m.UserId ?? "",
+                UserName = m.UserName ?? "",
+                UserEmail = m.UserEmail ?? "",
+                UserPhone = m.UserPhone ?? "",
+                UserType = m.UserType,
+                ContactType = m.ContactType,
+                Message = m.Message ?? "",
+                SubmittedAt = m.SubmittedAt,
+                IsRead = m.IsRead,
+                AdminResponse = m.AdminResponse ?? "",
+                RespondedAt = m.RespondedAt
+            }).ToList();
+
+            return Ok(messages);
         }
 
         /// <summary>
@@ -258,25 +258,26 @@ Agroreuse Team
             if (userId == null)
                 return Unauthorized();
 
-            var messages = await _context.ContactUsMessages
+            var rawMessages = await _context.ContactUsMessages
                 .Where(m => m.UserId == userId)
                 .OrderByDescending(m => m.SubmittedAt)
-                .Select(m => new ContactUsDto
-                {
-                    Id = m.Id,
-                    UserId = m.UserId ?? "",
-                    UserName = m.UserName ?? "",
-                    UserEmail = m.UserEmail ?? "",
-                    UserPhone = m.UserPhone,
-                    UserType = m.UserType,
-                    ContactType = m.ContactType,
-                    Message = m.Message ?? "",
-                    SubmittedAt = m.SubmittedAt,
-                    IsRead = m.IsRead,
-                    AdminResponse = m.AdminResponse,
-                    RespondedAt = m.RespondedAt
-                })
                 .ToListAsync();
+
+            var messages = rawMessages.Select(m => new ContactUsDto
+            {
+                Id = m.Id,
+                UserId = m.UserId ?? "",
+                UserName = m.UserName ?? "",
+                UserEmail = m.UserEmail ?? "",
+                UserPhone = m.UserPhone ?? "",
+                UserType = m.UserType,
+                ContactType = m.ContactType,
+                Message = m.Message ?? "",
+                SubmittedAt = m.SubmittedAt,
+                IsRead = m.IsRead,
+                AdminResponse = m.AdminResponse ?? "",
+                RespondedAt = m.RespondedAt
+            }).ToList();
 
             return Ok(messages);
         }

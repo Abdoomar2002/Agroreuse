@@ -8,6 +8,7 @@ import { AdminDashboardComponent } from './components/admin-dashboard/admin-dash
 import { UsersManagementComponent } from './components/users-management/users-management.component';
 import { GovernmentsComponent } from './components/governments/governments.component';
 import { ContactMessagesComponent } from './components/contact-messages/contact-messages.component';
+import { CategoriesComponent } from './components/categories/categories.component';
 import { AdminAuthGuard } from './guards/admin-auth.guard';
 
 const routes: Routes = [
@@ -33,7 +34,8 @@ const routes: Routes = [
     AdminDashboardComponent,
     UsersManagementComponent,
     GovernmentsComponent,
-    ContactMessagesComponent
+    ContactMessagesComponent,
+    CategoriesComponent
   ],
   imports: [
     CommonModule,

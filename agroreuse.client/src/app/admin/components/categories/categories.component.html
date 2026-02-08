@@ -1,0 +1,99 @@
+<div class="categories-page">
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>جاري التحميل...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && !loading" class="error-state">
+    <p>{{ error }}</p>
+    <button (click)="loadCategories()">حاول مرة أخرى</button>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!loading && !error" class="categories-content">
+    <!-- Header -->
+    <div class="page-header">
+      <div class="header-info">
+        <span class="count">{{ categories.length }} فئة</span>
+      </div>
+      <button class="add-btn" (click)="showAddForm = true" *ngIf="!showAddForm">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        إضافة فئة
+      </button>
+    </div>
+
+    <!-- Add Category Form -->
+    <div class="add-form" *ngIf="showAddForm">
+      <div class="form-row">
+        <input type="text" placeholder="اسم الفئة" [(ngModel)]="newCategoryName" (keyup.enter)="addCategory()">
+        <div class="image-upload">
+          <label class="upload-btn">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 8L12 3L7 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 3V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>{{ newCategoryImage ? 'تغيير الصورة' : 'رفع صورة' }}</span>
+            <input type="file" accept="image/*" (change)="onNewImageSelected($event)" hidden>
+          </label>
+          <img *ngIf="newImagePreview" [src]="newImagePreview" class="preview-img" alt="Preview">
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="save-btn" (click)="addCategory()" [disabled]="saving || !newCategoryName.trim()">
+          {{ saving ? 'جاري الحفظ...' : 'حفظ' }}
+        </button>
+        <button class="cancel-btn" (click)="resetAddForm()">إلغاء</button>
+      </div>
+    </div>
+
+    <!-- Categories Grid -->
+    <div class="categories-grid">
+      <div *ngIf="categories.length === 0" class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M19 11H5M19 11C20.1046 11 21 11.8954 21 13V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V13C3 11.8954 3.89543 11 5 11M19 11V9C19 7.89543 18.1046 7 17 7M5 11V9C5 7.89543 5.89543 7 7 7M7 7V5C7 3.89543 7.89543 3 9 3H15C16.1046 3 17 3.89543 17 5V7M7 7H17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <p>لا توجد فئات</p>
+      </div>
+
+      <div *ngFor="let cat of categories" class="category-card">
+        <!-- View Mode -->
+        <ng-container *ngIf="editingId !== cat.id">
+          <div class="card-image" [style.backgroundImage]="cat.imagePath ? 'url(' + getImageUrl(cat.imagePath) + ')' : 'none'">
+            <div class="no-image" *ngIf="!cat.imagePath">
+              <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><path d="M21 15L16 10L5 21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+          <div class="card-body">
+            <h3>{{ cat.name }}</h3>
+            <div class="card-actions">
+              <button class="action-btn edit" (click)="startEdit(cat)" title="تعديل">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M18.5 2.50001C18.8978 2.10219 19.4374 1.87869 20 1.87869C20.5626 1.87869 21.1022 2.10219 21.5 2.50001C21.8978 2.89784 22.1213 3.4374 22.1213 4.00001C22.1213 4.56262 21.8978 5.10219 21.5 5.50001L12 15L8 16L9 12L18.5 2.50001Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <button class="action-btn delete" (click)="deleteCategory(cat)" title="حذف">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M3 6H5H21M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
+          </div>
+        </ng-container>
+
+        <!-- Edit Mode -->
+        <ng-container *ngIf="editingId === cat.id">
+          <div class="card-image edit-mode" [style.backgroundImage]="editImagePreview ? 'url(' + editImagePreview + ')' : (cat.imagePath ? 'url(' + getImageUrl(cat.imagePath) + ')' : 'none')">
+            <label class="change-image-btn">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M23 19C23 19.5304 22.7893 20.0391 22.4142 20.4142C22.0391 20.7893 21.5304 21 21 21H3C2.46957 21 1.96086 20.7893 1.58579 20.4142C1.21071 20.0391 1 19.5304 1 19V8C1 7.46957 1.21071 6.96086 1.58579 6.58579C1.96086 6.21071 2.46957 6 3 6H7L9 3H15L17 6H21C21.5304 6 22.0391 6.21071 22.4142 6.58579C22.7893 6.96086 23 7.46957 23 8V19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="13" r="4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <input type="file" accept="image/*" (change)="onEditImageSelected($event)" hidden>
+            </label>
+          </div>
+          <div class="card-body edit-mode">
+            <input type="text" [(ngModel)]="editName" (keyup.enter)="saveEdit(cat)" class="edit-input">
+            <div class="card-actions">
+              <button class="action-btn save" (click)="saveEdit(cat)" [disabled]="saving" title="حفظ">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <button class="action-btn cancel" (click)="cancelEdit()" title="إلغاء">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>
