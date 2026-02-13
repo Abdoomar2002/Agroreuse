@@ -60,7 +60,6 @@ export interface UpdateOrderRequest {
   quantity: number;
   numberOfDays: string;
   status: OrderStatus;
-  imagePaths?: string[];
 }
 
 export interface OrderResponse {

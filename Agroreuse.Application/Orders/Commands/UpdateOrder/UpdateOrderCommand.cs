@@ -12,6 +12,5 @@ namespace Agroreuse.Application.Orders.Commands.UpdateOrder
         Guid CategoryId,
         int Quantity,
         string NumberOfDays,
-        OrderStatus Status,
-        List<string>? ImagePaths) : ICommand;
+        OrderStatus Status) : ICommand;
 }

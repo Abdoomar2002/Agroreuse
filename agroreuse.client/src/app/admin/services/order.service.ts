@@ -42,8 +42,7 @@ export class OrderService {
       categoryId: order.categoryId,
       quantity: order.quantity,
       numberOfDays: order.numberOfDays,
-      status: newStatus,
-      imagePaths: order.imagePaths
+      status: newStatus
     };
     return this.http.put(`${this.API_URL}/${id}`, updateRequest);
   }

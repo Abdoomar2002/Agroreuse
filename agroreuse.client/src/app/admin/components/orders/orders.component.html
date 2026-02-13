@@ -96,15 +96,15 @@
               </div>
             </td>
             <td>{{ order.categoryName }}</td>
-            <td>{{ order.quantity }}</td>
-            <td>{{ order.numberOfDays }} يوم</td>
+            <td>{{ order.quantity }} طن</td>
+            <td>{{ order.numberOfDays }} أسبوع</td>
             <td class="address-cell" [title]="order.addressDetails">{{ order.addressDetails }}</td>
             <td>
               <select 
                 class="status-select" 
                 [style.--status-color]="getStatusColor(order.status)"
                 [ngModel]="order.status" 
-                (change)="updateOrderStatus(order, $any($event.target).value)"
+                (ngModelChange)="updateOrderStatus(order, $event)"
                 [disabled]="updatingOrderId === order.id">
                 <option *ngFor="let opt of statusOptions" [ngValue]="opt.value">{{ opt.label }}</option>
               </select>
@@ -147,11 +147,11 @@
           </div>
           <div class="detail-item">
             <label>الكمية</label>
-            <p>{{ selectedOrder.quantity }}</p>
+            <p>{{ selectedOrder.quantity }} طن</p>
           </div>
           <div class="detail-item">
             <label>المدة</label>
-            <p>{{ selectedOrder.numberOfDays }} يوم</p>
+            <p>{{ selectedOrder.numberOfDays }} أسبوع</p>
           </div>
           <div class="detail-item full-width">
             <label>العنوان</label>

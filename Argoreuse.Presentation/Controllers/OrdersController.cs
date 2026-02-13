@@ -251,8 +251,7 @@ namespace WebUI.Controllers
                     request.CategoryId,
                     request.Quantity,
                     request.NumberOfDays,
-                    request.Status,
-                    request.ImagePaths);
+                    request.Status);
 
                 await _mediator.Send(command);
 
@@ -611,6 +610,5 @@ namespace WebUI.Controllers
         public int Quantity { get; set; }
         public string NumberOfDays { get; set; }
         public OrderStatus Status { get; set; }
-        public List<string>? ImagePaths { get; set; }
     }
 }

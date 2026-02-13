@@ -33,12 +33,28 @@ namespace WebUI.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto model)
         {
+            if(model == null || string.IsNullOrEmpty(model.Password) || string.IsNullOrEmpty(model.FullName))
+                return BadRequest(new { message = "Email, password, and full name are required." });
+            if((string.IsNullOrEmpty(model.Email) || model.Type==UserType.Farmer) && string.IsNullOrEmpty(model.PhoneNumber))
+                return BadRequest(new { message = "Either email or phone number is required." });
+            // Check if email or phone number already exists
+            if(model.Type==UserType.Factory && await _userManager.FindByEmailAsync(model.Email) != null)
+                return BadRequest(new { message = "Email is already registered." });
+            // Check if phone number already exists
+            if(model.Type==UserType.Farmer && await _userManager.Users.AnyAsync(u => u.PhoneNumber == model.PhoneNumber) )
+                return BadRequest(new { message = "Phone number is already registered." });
             var user = new ApplicationUser
             {
                 UserName = model?.Email??model.PhoneNumber,
                 Email = model.Email,
                 FullName = model.FullName,
-                Address = model.Address,
+                AddressNavigation =new() 
+                {
+                    GovernmentId=model.Address.GovernmentId,
+                    CityId=model.Address.CityId,
+                    Details=model.Address.Details,
+                    
+                },
                 PhoneNumber = model.PhoneNumber,
                 Type = model.Type,
                 CreatedAt = DateTime.UtcNow,

@@ -33,18 +33,6 @@ namespace Agroreuse.Application.Orders.Commands.UpdateOrder
                 request.NumberOfDays,
                 request.Status);
 
-            // Update images if provided
-            if (request.ImagePaths != null)
-            {
-                order.ClearImages();
-                var imagesToAdd = request.ImagePaths.Take(4).ToList();
-                foreach (var imagePath in imagesToAdd)
-                {
-                    var orderImage = new OrderImage(imagePath, order.Id);
-                    order.AddImage(orderImage);
-                }
-            }
-
             await _repository.UpdateAsync(order, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
         }
