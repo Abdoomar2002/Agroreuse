@@ -10,7 +10,7 @@ import { AdminUser } from '../../models/auth.models';
 })
 export class AdminDashboardComponent implements OnInit {
   currentUser: AdminUser | null = null;
-  currentView: 'users' | 'governments' | 'categories' | 'contact' | 'orders' = 'users';
+  currentView: 'users' | 'governments' | 'categories' | 'contact' | 'orders' | 'analytics' = 'users';
 
   constructor(
     private authService: AdminAuthService,
@@ -23,7 +23,7 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
-  navigateTo(view: 'users' | 'governments' | 'categories' | 'contact' | 'orders'): void {
+  navigateTo(view: 'users' | 'governments' | 'categories' | 'contact' | 'orders' | 'analytics'): void {
     this.currentView = view;
   }
 

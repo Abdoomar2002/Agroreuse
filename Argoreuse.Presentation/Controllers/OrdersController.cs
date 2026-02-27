@@ -38,6 +38,122 @@ namespace WebUI.Controllers
         }
 
         /// <summary>
+        /// Get aggregate statistics for orders (Admin only)
+        /// </summary>
+        [HttpGet("stats")]
+        [Authorize(Policy = "AdminOnly")]
+        public async Task<IActionResult> GetOrdersStatistics()
+        {
+            try
+            {
+                // total orders
+                var total = await _context.Orders.CountAsync();
+
+                // counts per status (materialize to memory to translate enum names)
+                var countsByStatus = _context.Orders
+                    .AsEnumerable()
+                    .GroupBy(o => o.Status)
+                    .Select(g => new { Status = g.Key.ToString(), Count = g.Count() })
+                    .ToDictionary(k => k.Status, v => v.Count);
+
+                // total and average quantity
+                var totalQuantity = await _context.Orders.SumAsync(o => (int?)o.Quantity) ?? 0;
+                var avgQuantity = total > 0 ? await _context.Orders.AverageAsync(o => o.Quantity) : 0;
+
+                // orders per month for last 6 months
+                var now = DateTime.UtcNow;
+                var months = Enumerable.Range(0, 6).Select(i => now.AddMonths(-i)).Reverse();
+                var ordersByMonth = months.Select(m => new
+                {
+                    Month = m.ToString("yyyy-MM"),
+                    Count = _context.Orders.Count(o => o.CreatedAt.Year == m.Year && o.CreatedAt.Month == m.Month)
+                }).ToList();
+
+                return Ok(new
+                {
+                    Success = true,
+                    Data = new
+                    {
+                        TotalOrders = total,
+                        CountsByStatus = countsByStatus,
+                        TotalQuantity = totalQuantity,
+                        AverageQuantity = avgQuantity,
+                        OrdersByMonth = ordersByMonth
+                    },
+                    Message = "Order statistics retrieved successfully."
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    Success = false,
+                    Message = ex.Message
+                });
+            }
+        }
+
+        /// <summary>
+        /// Get aggregate statistics for the current seller (authenticated user)
+        /// </summary>
+        [HttpGet("my-stats")]
+        public async Task<IActionResult> GetMyOrdersStatistics()
+        {
+            try
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (userId == null)
+                    return Unauthorized(new
+                    {
+                        Success = false,
+                        Message = "User not authenticated."
+                    });
+
+                var total = await _context.Orders.CountAsync(o => o.SellerId == userId);
+
+                var countsByStatus = _context.Orders
+                    .Where(o => o.SellerId == userId)
+                    .AsEnumerable()
+                    .GroupBy(o => o.Status)
+                    .Select(g => new { Status = g.Key.ToString(), Count = g.Count() })
+                    .ToDictionary(k => k.Status, v => v.Count);
+
+                var totalQuantity = await _context.Orders.Where(o => o.SellerId == userId).SumAsync(o => (int?)o.Quantity) ?? 0;
+                var avgQuantity = total > 0 ? await _context.Orders.Where(o => o.SellerId == userId).AverageAsync(o => o.Quantity) : 0;
+
+                var now = DateTime.UtcNow;
+                var months = Enumerable.Range(0, 6).Select(i => now.AddMonths(-i)).Reverse();
+                var ordersByMonth = months.Select(m => new
+                {
+                    Month = m.ToString("yyyy-MM"),
+                    Count = _context.Orders.Count(o => o.SellerId == userId && o.CreatedAt.Year == m.Year && o.CreatedAt.Month == m.Month)
+                }).ToList();
+
+                return Ok(new
+                {
+                    Success = true,
+                    Data = new
+                    {
+                        TotalOrders = total,
+                        CountsByStatus = countsByStatus,
+                        TotalQuantity = totalQuantity,
+                        AverageQuantity = avgQuantity,
+                        OrdersByMonth = ordersByMonth
+                    },
+                    Message = "Your order statistics retrieved successfully."
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    Success = false,
+                    Message = ex.Message
+                });
+            }
+        }
+
+        /// <summary>
         /// Get all orders (Admin only)
         /// </summary>
         [HttpGet]

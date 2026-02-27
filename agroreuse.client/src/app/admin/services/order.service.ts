@@ -72,4 +72,16 @@ export class OrderService {
   deleteOrderImage(orderId: string, imageId: string): Observable<any> {
     return this.http.delete(`${this.API_URL}/${orderId}/images/${imageId}`);
   }
+
+  getOrdersStatistics(): Observable<any> {
+    return this.http.get<ApiResponse<any>>(`${this.API_URL}/stats`).pipe(
+      map(response => response)
+    );
+  }
+
+  getMyOrdersStatistics(): Observable<any> {
+    return this.http.get<ApiResponse<any>>(`${this.API_URL}/my-stats`).pipe(
+      map(response => response)
+    );
+  }
 }

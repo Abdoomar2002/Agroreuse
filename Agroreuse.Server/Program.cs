@@ -66,6 +66,8 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+// Add SignalR
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -99,6 +101,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+// Map SignalR hubs
+app.MapHub<Agroreuse.Server.Hubs.NotificationHub>("/hubs/notifications");
 
 app.MapFallbackToFile("/index.html");
 

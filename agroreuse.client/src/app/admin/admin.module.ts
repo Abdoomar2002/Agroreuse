@@ -10,6 +10,7 @@ import { GovernmentsComponent } from './components/governments/governments.compo
 import { ContactMessagesComponent } from './components/contact-messages/contact-messages.component';
 import { CategoriesComponent } from './components/categories/categories.component';
 import { OrdersComponent } from './components/orders/orders.component';
+import { AnalyticsComponent } from './components/analytics/analytics.component';
 import { AdminAuthGuard } from './guards/admin-auth.guard';
 
 const routes: Routes = [
@@ -20,6 +21,11 @@ const routes: Routes = [
   {
     path: 'dashboard',
     component: AdminDashboardComponent,
+    canActivate: [AdminAuthGuard]
+  },
+  {
+    path: 'analytics',
+    component: AnalyticsComponent,
     canActivate: [AdminAuthGuard]
   },
   {
@@ -38,6 +44,7 @@ const routes: Routes = [
     ContactMessagesComponent,
     CategoriesComponent,
     OrdersComponent
+    ,AnalyticsComponent
   ],
   imports: [
     CommonModule,

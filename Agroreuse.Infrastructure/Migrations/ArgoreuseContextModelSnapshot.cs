@@ -52,7 +52,7 @@ namespace Agroreuse.Infrastructure.Migrations
 
                     b.HasIndex("GovernmentId");
 
-                    b.ToTable("Addresses");
+                    b.ToTable("Addresses", (string)null);
                 });
 
             modelBuilder.Entity("Agroreuse.Domain.Entities.ApplicationUser", b =>
@@ -156,7 +156,7 @@ namespace Agroreuse.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("Agroreuse.Domain.Entities.City", b =>
@@ -177,7 +177,7 @@ namespace Agroreuse.Infrastructure.Migrations
 
                     b.HasIndex("GovernmentId");
 
-                    b.ToTable("Cities");
+                    b.ToTable("Cities", (string)null);
                 });
 
             modelBuilder.Entity("Agroreuse.Domain.Entities.ContactUs", b =>
@@ -230,7 +230,7 @@ namespace Agroreuse.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ContactUsMessages");
+                    b.ToTable("ContactUsMessages", (string)null);
                 });
 
             modelBuilder.Entity("Agroreuse.Domain.Entities.Government", b =>
@@ -246,7 +246,7 @@ namespace Agroreuse.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Governments");
+                    b.ToTable("Governments", (string)null);
                 });
 
             modelBuilder.Entity("Agroreuse.Domain.Entities.Order", b =>
@@ -288,7 +288,7 @@ namespace Agroreuse.Infrastructure.Migrations
 
                     b.HasIndex("SellerId");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("Agroreuse.Domain.Entities.OrderImage", b =>
@@ -309,7 +309,7 @@ namespace Agroreuse.Infrastructure.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("OrderImages");
+                    b.ToTable("OrderImages", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

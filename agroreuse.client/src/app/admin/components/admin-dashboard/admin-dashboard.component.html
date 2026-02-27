@@ -17,6 +17,10 @@
         <svg viewBox="0 0 24 24" fill="none"><path d="M17 21V19C17 16.79 15.21 15 13 15H5C2.79 15 1 16.79 1 19V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"/><path d="M23 21V19C23 17.35 21.96 15.93 20.5 15.39" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.39C17.96 3.93 19 5.35 19 7C19 8.65 17.96 10.07 16.5 10.61" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         <span>المستخدمون</span>
       </button>
+      <button class="nav-button" [class.active]="currentView === 'analytics'" (click)="navigateTo('analytics')">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M3 3V21H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 14V7M12 14V3M17 14V10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>إحصائيات</span>
+      </button>
       <button class="nav-button" [class.active]="currentView === 'orders'" (click)="navigateTo('orders')">
         <svg viewBox="0 0 24 24" fill="none"><path d="M9 5H7C5.89543 5 5 5.89543 5 7V19C5 20.1046 5.89543 21 7 21H17C18.1046 21 19 20.1046 19 19V7C19 5.89543 18.1046 5 17 5H15M9 5C9 6.10457 9.89543 7 11 7H13C14.1046 7 15 6.10457 15 5M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5M12 12H15M12 16H15M9 12H9.01M9 16H9.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         <span>الطلبات</span>
@@ -68,6 +72,9 @@
       </div>
       <div *ngIf="currentView === 'orders'" class="view-container">
         <app-orders></app-orders>
+      </div>
+      <div *ngIf="currentView === 'analytics'" class="view-container">
+        <app-analytics></app-analytics>
       </div>
       <div *ngIf="currentView === 'categories'" class="view-container">
         <app-categories></app-categories>

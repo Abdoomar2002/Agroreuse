@@ -30,9 +30,14 @@ public static class DependencyInjection
         services.AddScoped<ISampleEntityRepository, SampleEntityRepository>();
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IAddressRepository, AddressRepository>();
+        services.AddScoped<INotificationRepository, NotificationRepository>();
 
         // Register file upload service
         services.AddScoped<IFileUploadService, FileUploadService>();
+
+        // Notification service
+        services.AddScoped<INotificationRepository, NotificationRepository>();
+        services.AddScoped<INotificationService, NotificationService>();
 
         // Register email service (mock for now)
         services.AddScoped<IEmailService, MockEmailService>();
