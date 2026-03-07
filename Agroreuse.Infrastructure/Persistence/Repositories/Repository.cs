@@ -10,10 +10,10 @@ namespace Agroreuse.Infrastructure.Persistence.Repositories;
 /// </summary>
 public class Repository<T> : IRepository<T> where T : Entity
 {
-    protected readonly ApplicationDbContext Context;
+    protected readonly ArgoreuseContext Context;
     protected readonly DbSet<T> DbSet;
 
-    public Repository(ApplicationDbContext context)
+    public Repository(ArgoreuseContext context)
     {
         Context = context;
         DbSet = context.Set<T>();

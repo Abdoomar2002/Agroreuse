@@ -1,0 +1,204 @@
+<div class="analytics-page">
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>جاري تحميل الإحصائيات...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && !loading" class="error-state">
+    <p>{{ error }}</p>
+    <button (click)="loadData()">حاول مرة أخرى</button>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!loading && !error" class="analytics-content">
+    <!-- Main Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card primary">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M9 5H7C5.89543 5 5 5.89543 5 7V19C5 20.1046 5.89543 21 7 21H17C18.1046 21 19 20.1046 19 19V7C19 5.89543 18.1046 5 17 5H15M9 5C9 6.10457 9.89543 7 11 7H13C14.1046 7 15 6.10457 15 5M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats?.totalOrders || 0 }}</span>
+          <span class="stat-label">إجمالي الطلبات</span>
+        </div>
+      </div>
+      <div class="stat-card success">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ getStatusCount('Completed') }}</span>
+          <span class="stat-label">طلبات مكتملة</span>
+        </div>
+      </div>
+      <div class="stat-card warning">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ getStatusCount('Pending') }}</span>
+          <span class="stat-label">قيد الانتظار</span>
+        </div>
+      </div>
+      <div class="stat-card info">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2"/><path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2"/></svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats?.totalQuantity || 0 }}</span>
+          <span class="stat-label">إجمالي الكمية (طن)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="charts-row">
+      <!-- Monthly Orders Chart -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3>الطلبات خلال الأشهر الأخيرة</h3>
+        </div>
+        <div class="chart-body">
+          <div class="bar-chart" *ngIf="stats?.ordersByMonth">
+            <div class="bar-item" *ngFor="let m of stats!.ordersByMonth">
+              <div class="bar-wrapper">
+                <div class="bar" [style.height.%]="getBarHeight(m.count)">
+                  <span class="bar-value">{{ m.count }}</span>
+                </div>
+              </div>
+              <span class="bar-label">{{ formatMonth(m.month) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status Distribution -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3>توزيع حالات الطلبات</h3>
+        </div>
+        <div class="chart-body">
+          <div class="status-distribution">
+            <div class="status-item" *ngFor="let opt of statusOptions">
+              <div class="status-info">
+                <span class="status-dot" [style.background]="getStatusColor(opt.value)"></span>
+                <span class="status-name">{{ opt.label }}</span>
+              </div>
+              <div class="status-bar-container">
+                <div class="status-bar" 
+                     [style.width.%]="stats?.totalOrders ? (getTotalByStatus(opt.value) / stats!.totalOrders * 100) : 0"
+                     [style.background]="getStatusColor(opt.value)">
+                </div>
+              </div>
+              <span class="status-count">{{ getTotalByStatus(opt.value) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="filters-section">
+      <div class="filters-header">
+        <h3>تصفية وبحث الطلبات</h3>
+        <button class="clear-btn" (click)="clearFilters()" *ngIf="searchQuery || selectedStatus !== 'all' || selectedCategory !== 'all' || dateFrom || dateTo">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          مسح الفلاتر
+        </button>
+      </div>
+      <div class="filters-bar">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/><path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <input type="text" placeholder="بحث بالاسم، الفئة، أو العنوان..." [(ngModel)]="searchQuery" (input)="onFilterChange()">
+        </div>
+        <div class="filter-group">
+          <label>الحالة</label>
+          <select [(ngModel)]="selectedStatus" (change)="onFilterChange()">
+            <option value="all">جميع الحالات</option>
+            <option *ngFor="let opt of statusOptions" [ngValue]="opt.value">{{ opt.label }}</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>الفئة</label>
+          <select [(ngModel)]="selectedCategory" (change)="onFilterChange()">
+            <option value="all">جميع الفئات</option>
+            <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>من تاريخ</label>
+          <input type="date" [(ngModel)]="dateFrom" (change)="onFilterChange()">
+        </div>
+        <div class="filter-group">
+          <label>إلى تاريخ</label>
+          <input type="date" [(ngModel)]="dateTo" (change)="onFilterChange()">
+        </div>
+      </div>
+    </div>
+
+    <!-- Filtered Results Stats -->
+    <div class="results-stats">
+      <div class="result-stat">
+        <span class="result-value">{{ filteredOrders.length }}</span>
+        <span class="result-label">طلب</span>
+      </div>
+      <div class="result-stat">
+        <span class="result-value">{{ getFilteredTotalQuantity() }}</span>
+        <span class="result-label">إجمالي الكمية (طن)</span>
+      </div>
+      <div class="result-stat">
+        <span class="result-value">{{ getFilteredAverageQuantity() | number:'1.0-1' }}</span>
+        <span class="result-label">متوسط الكمية</span>
+      </div>
+    </div>
+
+    <!-- Filtered Orders Table -->
+    <div class="table-container">
+      <div class="table-header">
+        <h3>قائمة الطلبات</h3>
+        <span class="results-count">{{ filteredOrders.length }} نتيجة</span>
+      </div>
+      
+      <div *ngIf="filteredOrders.length === 0" class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M9 5H7C5.89543 5 5 5.89543 5 7V19C5 20.1046 5.89543 21 7 21H17C18.1046 21 19 20.1046 19 19V7C19 5.89543 18.1046 5 17 5H15M9 5C9 6.10457 9.89543 7 11 7H13C14.1046 7 15 6.10457 15 5M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <p>لا توجد طلبات مطابقة للفلاتر</p>
+      </div>
+
+      <table *ngIf="filteredOrders.length > 0" class="data-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>البائع</th>
+            <th>الفئة</th>
+            <th>الكمية</th>
+            <th>العنوان</th>
+            <th>الحالة</th>
+            <th>التاريخ</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let order of filteredOrders; let i = index">
+            <td class="row-num">{{ i + 1 }}</td>
+            <td>
+              <div class="seller-cell">
+                <div class="seller-avatar">{{ order.sellerName.charAt(0) }}</div>
+                <span>{{ order.sellerName }}</span>
+              </div>
+            </td>
+            <td>{{ order.categoryName }}</td>
+            <td>{{ order.quantity }} طن</td>
+            <td class="address-cell" [title]="order.addressDetails">{{ order.addressDetails }}</td>
+            <td>
+              <span class="status-badge" [style.background]="getStatusColor(order.status)">
+                {{ getStatusLabel(order.status) }}
+              </span>
+            </td>
+            <td class="date-cell">{{ formatDate(order.createdAt) }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

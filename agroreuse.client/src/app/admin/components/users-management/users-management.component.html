@@ -1,0 +1,103 @@
+<div class="users-page">
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>جاري تحميل المستخدمين...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && !loading" class="error-state">
+    <p>{{ error }}</p>
+    <button (click)="loadUsers()">حاول مرة أخرى</button>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!loading && !error" class="users-content">
+    <!-- Stats Cards -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon all"><svg viewBox="0 0 24 24" fill="none"><path d="M17 21V19C17 16.79 15.21 15 13 15H5C2.79 15 1 16.79 1 19V21" stroke="currentColor" stroke-width="2"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"/></svg></div>
+        <div class="stat-info"><span class="stat-value">{{ allUsers.length }}</span><span class="stat-label">إجمالي المستخدمين</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon farmer"><svg viewBox="0 0 24 24" fill="none"><path d="M12 10C14.21 10 16 8.21 16 6S14.21 2 12 2 8 3.79 8 6s1.79 4 4 4zM12 14c-4 0-8 2-8 6v2h16v-2c0-4-4-6-8-6z" stroke="currentColor" stroke-width="2"/></svg></div>
+        <div class="stat-info"><span class="stat-value">{{ farmersCount }}</span><span class="stat-label">المزارعون</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon factory"><svg viewBox="0 0 24 24" fill="none"><path d="M6 4V10H2V22H22V10H18V4H6Z" stroke="currentColor" stroke-width="2"/><path d="M10 14H14V22" stroke="currentColor" stroke-width="2"/></svg></div>
+        <div class="stat-info"><span class="stat-value">{{ factoriesCount }}</span><span class="stat-label">المصانع</span></div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-bar">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/><path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input type="text" placeholder="بحث بالاسم، البريد، الهاتف..." [(ngModel)]="searchQuery" (ngModelChange)="onSearchChange()">
+      </div>
+      <div class="filter-group">
+        <label>النوع:</label>
+        <select [(ngModel)]="selectedType" (ngModelChange)="onTypeChange($event)">
+          <option value="all">الكل</option>
+          <option [ngValue]="0">مزارع</option>
+          <option [ngValue]="1">مصنع</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>الحالة:</label>
+        <select [(ngModel)]="selectedStatus" (ngModelChange)="onStatusChange($event)">
+          <option value="all">الكل</option>
+          <option value="active">نشط</option>
+          <option value="locked">مقفل</option>
+        </select>
+      </div>
+      <span class="results-count">{{ filteredUsers.length }} نتيجة</span>
+    </div>
+
+    <!-- Excel Table -->
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>الاسم الكامل</th>
+            <th>البريد الإلكتروني</th>
+            <th>رقم الهاتف</th>
+            <th>النوع</th>
+            <th>العنوان</th>
+            <th>تاريخ التسجيل</th>
+            <th>الحالة</th>
+            <th>إجراءات</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="filteredUsers.length === 0">
+            <td colspan="9" class="empty-row">لا توجد نتائج</td>
+          </tr>
+          <tr *ngFor="let user of filteredUsers; let i = index">
+            <td class="row-num">{{ i + 1 }}</td>
+            <td class="name-cell">{{ user.fullName }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.phoneNumber || '-' }}</td>
+            <td><span class="type-badge" [class.farmer]="user.type === 0" [class.factory]="user.type === 1">{{ getUserTypeLabel(user.type) }}</span></td>
+            <td class="address-cell">{{ user.address || '-' }}</td>
+            <td>{{ formatDate(user.createdAt) }}</td>
+            <td><span class="status-badge" [class.active]="!user.isLocked" [class.locked]="user.isLocked">{{ user.isLocked ? 'محظور' : 'نشط' }}</span></td>
+            <td class="actions-cell">
+              <button 
+                class="action-btn" 
+                [class.block-btn]="!user.isLocked" 
+                [class.unblock-btn]="user.isLocked"
+                [disabled]="updatingUserId === user.id || user.type === 2"
+                (click)="toggleBlockStatus(user)"
+                [title]="user.type === 2 ? 'لا يمكن حظر المسؤول' : (user.isLocked ? 'إلغاء الحظر' : 'حظر')">
+                <span *ngIf="updatingUserId === user.id">...</span>
+                <span *ngIf="updatingUserId !== user.id">{{ user.isLocked ? 'إلغاء الحظر' : 'حظر' }}</span>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
