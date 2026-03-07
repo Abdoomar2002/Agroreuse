@@ -18,6 +18,9 @@ export class UsersManagementComponent implements OnInit {
   selectedType: 'all' | 0 | 1 = 'all'; // 0=Farmer, 1=Factory
   selectedStatus: 'all' | 'active' | 'locked' = 'all';
 
+  // Block status update
+  updatingUserId: string | null = null;
+
   constructor(private usersService: UsersService) {}
 
   ngOnInit(): void {
@@ -83,6 +86,29 @@ export class UsersManagementComponent implements OnInit {
   onStatusChange(status: 'all' | 'active' | 'locked'): void {
     this.selectedStatus = status;
     this.applyFilters();
+  }
+
+  toggleBlockStatus(user: User): void {
+    const newStatus = !user.isLocked;
+    const action = newStatus ? 'حظر' : 'إلغاء حظر';
+
+    if (!confirm(`هل تريد ${action} المستخدم "${user.fullName}"؟`)) {
+      return;
+    }
+
+    this.updatingUserId = user.id;
+    this.usersService.setUserBlockStatus(user.id, newStatus).subscribe({
+      next: () => {
+        user.isLocked = newStatus;
+        this.updatingUserId = null;
+        this.applyFilters();
+      },
+      error: (err) => {
+        alert(`فشل ${action} المستخدم`);
+        this.updatingUserId = null;
+        console.error(err);
+      }
+    });
   }
 
   get farmersCount(): number {

@@ -67,11 +67,12 @@
             <th>العنوان</th>
             <th>تاريخ التسجيل</th>
             <th>الحالة</th>
+            <th>إجراءات</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngIf="filteredUsers.length === 0">
-            <td colspan="8" class="empty-row">لا توجد نتائج</td>
+            <td colspan="9" class="empty-row">لا توجد نتائج</td>
           </tr>
           <tr *ngFor="let user of filteredUsers; let i = index">
             <td class="row-num">{{ i + 1 }}</td>
@@ -81,7 +82,19 @@
             <td><span class="type-badge" [class.farmer]="user.type === 0" [class.factory]="user.type === 1">{{ getUserTypeLabel(user.type) }}</span></td>
             <td class="address-cell">{{ user.address || '-' }}</td>
             <td>{{ formatDate(user.createdAt) }}</td>
-            <td><span class="status-badge" [class.active]="!user.isLocked" [class.locked]="user.isLocked">{{ user.isLocked ? 'مقفل' : 'نشط' }}</span></td>
+            <td><span class="status-badge" [class.active]="!user.isLocked" [class.locked]="user.isLocked">{{ user.isLocked ? 'محظور' : 'نشط' }}</span></td>
+            <td class="actions-cell">
+              <button 
+                class="action-btn" 
+                [class.block-btn]="!user.isLocked" 
+                [class.unblock-btn]="user.isLocked"
+                [disabled]="updatingUserId === user.id || user.type === 2"
+                (click)="toggleBlockStatus(user)"
+                [title]="user.type === 2 ? 'لا يمكن حظر المسؤول' : (user.isLocked ? 'إلغاء الحظر' : 'حظر')">
+                <span *ngIf="updatingUserId === user.id">...</span>
+                <span *ngIf="updatingUserId !== user.id">{{ user.isLocked ? 'إلغاء الحظر' : 'حظر' }}</span>
+              </button>
+            </td>
           </tr>
         </tbody>
       </table>

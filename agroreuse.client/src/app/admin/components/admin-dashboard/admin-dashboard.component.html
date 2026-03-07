@@ -51,11 +51,13 @@
       <div class="header-left">
         <h2 *ngIf="currentView === 'users'">المستخدمون</h2>
         <h2 *ngIf="currentView === 'orders'">الطلبات</h2>
+        <h2 *ngIf="currentView === 'analytics'">إحصائيات الطلبات</h2>
         <h2 *ngIf="currentView === 'categories'">الفئات</h2>
         <h2 *ngIf="currentView === 'governments'">المحافظات والمدن</h2>
         <h2 *ngIf="currentView === 'contact'">رسائل التواصل</h2>
       </div>
       <div class="header-right">
+        <app-notifications-dropdown></app-notifications-dropdown>
         <div class="user-profile">
           <div class="avatar">{{ currentUser?.firstName?.charAt(0) }}{{ currentUser?.lastName?.charAt(0) }}</div>
           <div class="profile-info">

@@ -19,4 +19,8 @@ export class UsersService {
   getUsersByType(type: 'Farmer' | 'Factory'): Observable<User[]> {
     return this.http.get<User[]>(`${this.API_URL}?type=${type}`);
   }
+
+  setUserBlockStatus(userId: string, isBlocked: boolean): Observable<any> {
+    return this.http.put(`${this.API_URL}/${userId}/block`, { isBlocked });
+  }
 }

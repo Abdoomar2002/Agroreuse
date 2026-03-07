@@ -11,6 +11,7 @@ import { ContactMessagesComponent } from './components/contact-messages/contact-
 import { CategoriesComponent } from './components/categories/categories.component';
 import { OrdersComponent } from './components/orders/orders.component';
 import { AnalyticsComponent } from './components/analytics/analytics.component';
+import { NotificationsDropdownComponent } from './components/notifications-dropdown/notifications-dropdown.component';
 import { AdminAuthGuard } from './guards/admin-auth.guard';
 
 const routes: Routes = [
@@ -43,8 +44,9 @@ const routes: Routes = [
     GovernmentsComponent,
     ContactMessagesComponent,
     CategoriesComponent,
-    OrdersComponent
-    ,AnalyticsComponent
+    OrdersComponent,
+    AnalyticsComponent,
+    NotificationsDropdownComponent
   ],
   imports: [
     CommonModule,

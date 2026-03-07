@@ -19,6 +19,7 @@ namespace Agroreuse.Infrastructure.Persistence
         public DbSet<ContactUs> ContactUsMessages { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderImage> OrderImages { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -123,6 +124,17 @@ namespace Agroreuse.Infrastructure.Persistence
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.ImagePath).IsRequired().HasMaxLength(500);
+            });
+
+            // Configure Notification
+            modelBuilder.Entity<Notification>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.RecipientId).IsRequired().HasMaxLength(450);
+                entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
+                entity.Property(e => e.Message).IsRequired().HasMaxLength(1000);
+                entity.Property(e => e.Status).IsRequired();
+                entity.Property(e => e.CreatedAt).IsRequired();
             });
         }
 

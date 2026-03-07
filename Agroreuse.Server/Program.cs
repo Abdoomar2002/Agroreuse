@@ -1,7 +1,9 @@
 using Agroreuse.Application;
+using Agroreuse.Application.Services;
 using Agroreuse.Domain.Entities;
 using Agroreuse.Infrastructure;
 using Agroreuse.Infrastructure.Persistence;
+using Agroreuse.Server.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -53,6 +55,20 @@ builder.Services.AddAuthentication(options =>
         ValidateLifetime = true,
         ClockSkew = TimeSpan.Zero
     };
+    // Allow SignalR to receive token from query string
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var accessToken = context.Request.Query["access_token"];
+            var path = context.HttpContext.Request.Path;
+            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+            {
+                context.Token = accessToken;
+            }
+            return Task.CompletedTask;
+        }
+    };
 });
 
 // Add authorization policies
@@ -68,6 +84,9 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 // Add SignalR
 builder.Services.AddSignalR();
+
+// Register SignalR notification pusher
+builder.Services.AddScoped<INotificationPusher, SignalRNotificationPusher>();
 
 var app = builder.Build();
 

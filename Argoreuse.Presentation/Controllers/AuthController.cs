@@ -87,9 +87,9 @@ namespace WebUI.Controllers
             if (user == null)
                 return Unauthorized(new { message = "Invalid email or password." });
 
-            // Check if account is locked
+            // Check if account is blocked
             if (user.IsLocked)
-                return Unauthorized(new { message = "This account has been locked." });
+                return StatusCode(403, new { message = "This account has been blocked. Please contact support." });
             
             // Use CheckPasswordAsync instead of PasswordSignInAsync for JWT-based auth
             var isValidPassword = await _userManager.CheckPasswordAsync(user, model.Password);

@@ -90,6 +90,18 @@
 .status-badge.active { background: #e8f5e9; color: #2e7d32; }
 .status-badge.locked { background: #ffebee; color: #c62828; }
 
+/* Action Buttons */
+.actions-cell { white-space: nowrap; }
+.action-btn {
+  padding: 6px 14px; border: none; border-radius: 6px; font-size: 12px;
+  font-weight: 600; cursor: pointer; transition: all 0.2s;
+}
+.action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.action-btn.block-btn { background: #ffebee; color: #c62828; }
+.action-btn.block-btn:hover:not(:disabled) { background: #ffcdd2; }
+.action-btn.unblock-btn { background: #e8f5e9; color: #2e7d32; }
+.action-btn.unblock-btn:hover:not(:disabled) { background: #c8e6c9; }
+
 /* Responsive */
 @media (max-width: 900px) {
   .stats-row { grid-template-columns: 1fr; }
