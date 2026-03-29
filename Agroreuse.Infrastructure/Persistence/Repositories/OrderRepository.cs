@@ -55,5 +55,17 @@ namespace Agroreuse.Infrastructure.Persistence.Repositories
                 .Include(o => o.Images)
                 .ToListAsync(cancellationToken);
         }
+
+        public async Task<IReadOnlyList<Order>> GetBySellerTypeAsync(UserType sellerType, CancellationToken cancellationToken = default)
+        {
+            return await DbSet
+                .Include(o => o.Seller)
+                .Include(o => o.Address)
+                .Include(o => o.Category)
+                .Include(o => o.Images)
+                .Where(o => o.Seller.Type == sellerType)
+                .OrderByDescending(o => o.CreatedAt)
+                .ToListAsync(cancellationToken);
+        }
     }
 }

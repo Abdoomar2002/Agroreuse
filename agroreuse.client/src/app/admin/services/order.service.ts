@@ -24,6 +24,18 @@ export class OrderService {
     );
   }
 
+  getFarmerOrders(): Observable<Order[]> {
+    return this.http.get<ApiResponse<Order[]>>(`${this.API_URL}/farmers`).pipe(
+      map(response => response.data)
+    );
+  }
+
+  getFactoryOrders(): Observable<Order[]> {
+    return this.http.get<ApiResponse<Order[]>>(`${this.API_URL}/factories`).pipe(
+      map(response => response.data)
+    );
+  }
+
   getOrderById(id: string): Observable<Order> {
     return this.http.get<ApiResponse<Order>>(`${this.API_URL}/${id}`).pipe(
       map(response => response.data)

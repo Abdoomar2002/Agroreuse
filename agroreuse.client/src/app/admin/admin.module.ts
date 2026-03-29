@@ -10,6 +10,8 @@ import { GovernmentsComponent } from './components/governments/governments.compo
 import { ContactMessagesComponent } from './components/contact-messages/contact-messages.component';
 import { CategoriesComponent } from './components/categories/categories.component';
 import { OrdersComponent } from './components/orders/orders.component';
+import { FarmerOrdersComponent } from './components/farmer-orders/farmer-orders.component';
+import { FactoryOrdersComponent } from './components/factory-orders/factory-orders.component';
 import { AnalyticsComponent } from './components/analytics/analytics.component';
 import { NotificationsDropdownComponent } from './components/notifications-dropdown/notifications-dropdown.component';
 import { AdminAuthGuard } from './guards/admin-auth.guard';
@@ -45,6 +47,8 @@ const routes: Routes = [
     ContactMessagesComponent,
     CategoriesComponent,
     OrdersComponent,
+    FarmerOrdersComponent,
+    FactoryOrdersComponent,
     AnalyticsComponent,
     NotificationsDropdownComponent
   ],

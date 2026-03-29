@@ -12,5 +12,6 @@ namespace Agroreuse.Domain.Repositories
         Task<IReadOnlyList<Order>> GetByStatusAsync(OrderStatus status, CancellationToken cancellationToken = default);
         Task<Order?> GetByIdWithDetailsAsync(Guid id, CancellationToken cancellationToken = default);
         Task<IReadOnlyList<Order>> GetAllWithDetailsAsync(CancellationToken cancellationToken = default);
+        Task<IReadOnlyList<Order>> GetBySellerTypeAsync(UserType sellerType, CancellationToken cancellationToken = default);
     }
 }

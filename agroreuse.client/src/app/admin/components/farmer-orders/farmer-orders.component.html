@@ -1,0 +1,200 @@
+<div class="orders-page">
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>جاري تحميل طلبات المزارعين...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && !loading" class="error-state">
+    <p>{{ error }}</p>
+    <button (click)="loadOrders()">حاول مرة أخرى</button>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!loading && !error" class="orders-content">
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card" (click)="onStatusFilterChange('all')" [class.active]="statusFilter === 'all'">
+        <div class="stat-icon total">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 10C14.21 10 16 8.21 16 6S14.21 2 12 2 8 3.79 8 6s1.79 4 4 4zM12 14c-4 0-8 2-8 6v2h16v-2c0-4-4-6-8-6z" stroke="currentColor" stroke-width="2"/></svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ getTotalOrdersCount() }}</span>
+          <span class="stat-label">طلبات المزارعين</span>
+        </div>
+      </div>
+      <div class="stat-card" (click)="onStatusFilterChange(0)" [class.active]="statusFilter === 0">
+        <div class="stat-icon pending">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ getOrdersCountByStatus(0) }}</span>
+          <span class="stat-label">قيد الانتظار</span>
+        </div>
+      </div>
+      <div class="stat-card" (click)="onStatusFilterChange(1)" [class.active]="statusFilter === 1">
+        <div class="stat-icon approved">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ getOrdersCountByStatus(1) }}</span>
+          <span class="stat-label">موافق عليه</span>
+        </div>
+      </div>
+      <div class="stat-card" (click)="onStatusFilterChange(4)" [class.active]="statusFilter === 4">
+        <div class="stat-icon completed">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M22 11.08V12C21.9988 14.1564 21.3005 16.2547 20.0093 17.9818C18.7182 19.709 16.9033 20.9725 14.8354 21.5839C12.7674 22.1953 10.5573 22.1219 8.53447 21.3746C6.51168 20.6273 4.78465 19.2461 3.61096 17.4371C2.43727 15.628 1.87979 13.4881 2.02168 11.3363C2.16356 9.18455 2.99721 7.13631 4.39828 5.49706C5.79935 3.85781 7.69279 2.71537 9.79619 2.24013C11.8996 1.7649 14.1003 1.98232 16.07 2.85999" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 4L12 14.01L9 11.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ getOrdersCountByStatus(4) }}</span>
+          <span class="stat-label">مكتمل</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-bar">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/><path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input type="text" placeholder="بحث بالاسم، الفئة، أو العنوان..." [(ngModel)]="searchQuery" (input)="onSearchChange()">
+      </div>
+      <div class="filter-dropdown">
+        <select [(ngModel)]="statusFilter" (change)="applyFilters()">
+          <option value="all">جميع الحالات</option>
+          <option *ngFor="let opt of statusOptions" [ngValue]="opt.value">{{ opt.label }}</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Orders Table -->
+    <div class="table-container">
+      <div *ngIf="filteredOrders.length === 0" class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 10C14.21 10 16 8.21 16 6S14.21 2 12 2 8 3.79 8 6s1.79 4 4 4zM12 14c-4 0-8 2-8 6v2h16v-2c0-4-4-6-8-6z" stroke="currentColor" stroke-width="2"/></svg>
+        <p>لا توجد طلبات من المزارعين</p>
+      </div>
+
+      <table *ngIf="filteredOrders.length > 0" class="orders-table">
+        <thead>
+          <tr>
+            <th>المزارع</th>
+            <th>الفئة</th>
+            <th>الكمية</th>
+            <th>المدة</th>
+            <th>العنوان</th>
+            <th>الحالة</th>
+            <th>التاريخ</th>
+            <th>الإجراءات</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let order of filteredOrders">
+            <td>
+              <div class="seller-cell">
+                <div class="seller-avatar farmer">{{ order.sellerName.charAt(0) }}</div>
+                <span>{{ order.sellerName }}</span>
+              </div>
+            </td>
+            <td>{{ order.categoryName }}</td>
+            <td>{{ order.quantity }} طن</td>
+            <td>{{ order.numberOfDays }} أسبوع</td>
+            <td class="address-cell" [title]="order.addressDetails">{{ order.addressDetails }}</td>
+            <td>
+              <select 
+                class="status-select" 
+                [style.--status-color]="getStatusColor(order.status)"
+                [ngModel]="order.status" 
+                (ngModelChange)="updateOrderStatus(order, $event)"
+                [disabled]="updatingOrderId === order.id">
+                <option *ngFor="let opt of statusOptions" [ngValue]="opt.value">{{ opt.label }}</option>
+              </select>
+            </td>
+            <td class="date-cell">{{ formatDate(order.createdAt) }}</td>
+            <td>
+              <div class="action-buttons">
+                <button class="action-btn view" (click)="viewOrderDetails(order)" title="عرض التفاصيل">
+                  <svg viewBox="0 0 24 24" fill="none"><path d="M1 12S5 4 12 4S23 12 23 12S19 20 12 20S1 12 1 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/></svg>
+                </button>
+                <button class="action-btn delete" (click)="deleteOrder(order)" title="حذف">
+                  <svg viewBox="0 0 24 24" fill="none"><path d="M3 6H5H21M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Order Detail Modal -->
+  <div class="modal-overlay" *ngIf="showDetailModal" (click)="closeDetailModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>تفاصيل طلب المزارع</h3>
+        <button class="close-btn" (click)="closeDetailModal()">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      <div class="modal-body" *ngIf="selectedOrder">
+        <div class="detail-grid">
+          <div class="detail-item">
+            <label>المزارع</label>
+            <p>{{ selectedOrder.sellerName }}</p>
+          </div>
+          <div class="detail-item">
+            <label>الفئة</label>
+            <p>{{ selectedOrder.categoryName }}</p>
+          </div>
+          <div class="detail-item">
+            <label>الكمية</label>
+            <p>{{ selectedOrder.quantity }} طن</p>
+          </div>
+          <div class="detail-item">
+            <label>المدة</label>
+            <p>{{ selectedOrder.numberOfDays }} أسبوع</p>
+          </div>
+          <div class="detail-item full-width">
+            <label>العنوان</label>
+            <p>{{ selectedOrder.addressDetails }}</p>
+          </div>
+          <div class="detail-item">
+            <label>الحالة</label>
+            <span class="status-badge" [style.background]="getStatusColor(selectedOrder.status)">
+              {{ getStatusLabel(selectedOrder.status) }}
+            </span>
+          </div>
+          <div class="detail-item">
+            <label>تاريخ الإنشاء</label>
+            <p>{{ formatDate(selectedOrder.createdAt) }}</p>
+          </div>
+        </div>
+
+        <!-- Images -->
+        <div class="images-section" *ngIf="selectedOrder.imagePaths && selectedOrder.imagePaths.length > 0">
+          <label>الصور</label>
+          <div class="images-grid">
+            <div *ngFor="let img of selectedOrder.imagePaths" class="image-item">
+              <img [src]="getImageUrl(img)" alt="Order image" (error)="$any($event.target).style.display='none'">
+            </div>
+          </div>
+        </div>
+
+        <!-- Status Update -->
+        <div class="status-update-section">
+          <label>تغيير الحالة</label>
+          <div class="status-buttons">
+            <button 
+              *ngFor="let opt of statusOptions" 
+              class="status-btn"
+              [class.active]="selectedOrder.status === opt.value"
+              [style.--btn-color]="getStatusColor(opt.value)"
+              (click)="updateOrderStatus(selectedOrder, opt.value)"
+              [disabled]="updatingOrderId === selectedOrder.id">
+              {{ opt.label }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

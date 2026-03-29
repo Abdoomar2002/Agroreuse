@@ -183,6 +183,106 @@ namespace WebUI.Controllers
         }
 
         /// <summary>
+        /// Get all farmer orders (Admin only)
+        /// </summary>
+        [HttpGet("farmers")]
+        [Authorize(Policy = "AdminOnly")]
+        public async Task<IActionResult> GetFarmerOrders()
+        {
+            try
+            {
+                var orders = await _context.Orders
+                    .Include(o => o.Seller)
+                    .Include(o => o.Address)
+                    .Include(o => o.Category)
+                    .Include(o => o.Images)
+                    .Where(o => o.Seller.Type == UserType.Farmer)
+                    .OrderByDescending(o => o.CreatedAt)
+                    .Select(o => new
+                    {
+                        o.Id,
+                        o.SellerId,
+                        SellerName = o.Seller.FullName ?? string.Empty,
+                        o.AddressId,
+                        AddressDetails = o.Address.Details ?? string.Empty,
+                        o.CategoryId,
+                        CategoryName = o.Category.Name ?? string.Empty,
+                        o.Quantity,
+                        o.NumberOfDays,
+                        o.Status,
+                        o.CreatedAt,
+                        ImagePaths = o.Images.Select(i => i.ImagePath).ToList()
+                    })
+                    .ToListAsync();
+
+                return Ok(new
+                {
+                    Success = true,
+                    Data = orders,
+                    Message = "Farmer orders retrieved successfully."
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    Success = false,
+                    Message = ex.Message
+                });
+            }
+        }
+
+        /// <summary>
+        /// Get all factory orders (Admin only)
+        /// </summary>
+        [HttpGet("factories")]
+        [Authorize(Policy = "AdminOnly")]
+        public async Task<IActionResult> GetFactoryOrders()
+        {
+            try
+            {
+                var orders = await _context.Orders
+                    .Include(o => o.Seller)
+                    .Include(o => o.Address)
+                    .Include(o => o.Category)
+                    .Include(o => o.Images)
+                    .Where(o => o.Seller.Type == UserType.Factory)
+                    .OrderByDescending(o => o.CreatedAt)
+                    .Select(o => new
+                    {
+                        o.Id,
+                        o.SellerId,
+                        SellerName = o.Seller.FullName ?? string.Empty,
+                        o.AddressId,
+                        AddressDetails = o.Address.Details ?? string.Empty,
+                        o.CategoryId,
+                        CategoryName = o.Category.Name ?? string.Empty,
+                        o.Quantity,
+                        o.NumberOfDays,
+                        o.Status,
+                        o.CreatedAt,
+                        ImagePaths = o.Images.Select(i => i.ImagePath).ToList()
+                    })
+                    .ToListAsync();
+
+                return Ok(new
+                {
+                    Success = true,
+                    Data = orders,
+                    Message = "Factory orders retrieved successfully."
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    Success = false,
+                    Message = ex.Message
+                });
+            }
+        }
+
+        /// <summary>
         /// Get order by ID
         /// </summary>
         [HttpGet("{id}")]

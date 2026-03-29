@@ -4,6 +4,8 @@ import { AdminAuthService } from '../../services/admin-auth.service';
 import { NotificationService } from '../../services/notification.service';
 import { AdminUser } from '../../models/auth.models';
 
+type ViewType = 'users' | 'governments' | 'categories' | 'contact' | 'orders' | 'farmer-orders' | 'factory-orders' | 'analytics';
+
 @Component({
   selector: 'app-admin-dashboard',
   templateUrl: './admin-dashboard.component.html',
@@ -11,7 +13,7 @@ import { AdminUser } from '../../models/auth.models';
 })
 export class AdminDashboardComponent implements OnInit, OnDestroy {
   currentUser: AdminUser | null = null;
-  currentView: 'users' | 'governments' | 'categories' | 'contact' | 'orders' | 'analytics' = 'users';
+  currentView: ViewType = 'users';
 
   constructor(
     private authService: AdminAuthService,
@@ -35,7 +37,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.notificationService.stopConnection();
   }
 
-  navigateTo(view: 'users' | 'governments' | 'categories' | 'contact' | 'orders' | 'analytics'): void {
+  navigateTo(view: ViewType): void {
     this.currentView = view;
   }
 
