@@ -32,13 +32,13 @@ namespace Agroreuse.Infrastructure.Services
 
             if (_pusher != null)
             {
-                await _pusher.SendToUserAsync(notification.RecipientId, new
+                await _pusher.SendToUserAsync(notification.RecipientId, new NotificationMessage
                 {
-                    notification.Id,
-                    notification.Title,
-                    notification.Message,
-                    notification.CreatedAt,
-                    notification.OrderId,
+                    Id=notification.Id,
+                    Title=notification.Title,
+                    Message=notification.Message,
+                    CreatedAt=notification.CreatedAt,
+                    OrderId=notification.OrderId,
                     Status = notification.Status.ToString()
                 });
             }
@@ -67,5 +67,15 @@ namespace Agroreuse.Infrastructure.Services
         {
             return await _repo.GetUnreadCountAsync(recipientId, cancellationToken);
         }
+    }
+
+    public class NotificationMessage
+    {
+        public string Status { get; set; }
+        public Guid Id { get; internal set; }
+        public string Title { get; internal set; }
+        public string Message { get; internal set; }
+        public DateTime CreatedAt { get; internal set; }
+        public Guid? OrderId { get; internal set; }
     }
 }

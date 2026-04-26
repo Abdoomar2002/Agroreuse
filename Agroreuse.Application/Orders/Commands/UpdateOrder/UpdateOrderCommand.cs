@@ -10,6 +10,7 @@ namespace Agroreuse.Application.Orders.Commands.UpdateOrder
         Guid Id,
         Guid AddressId,
         Guid CategoryId,
+        string? Description,
         int Quantity,
         string NumberOfDays,
         OrderStatus Status) : ICommand;

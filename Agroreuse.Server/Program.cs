@@ -4,6 +4,8 @@ using Agroreuse.Domain.Entities;
 using Agroreuse.Infrastructure;
 using Agroreuse.Infrastructure.Persistence;
 using Agroreuse.Server.Services;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -85,8 +87,33 @@ builder.Services.AddOpenApi();
 // Add SignalR
 builder.Services.AddSignalR();
 
-// Register SignalR notification pusher
-builder.Services.AddScoped<INotificationPusher, SignalRNotificationPusher>();
+// Initialize Firebase Admin SDK
+var firebaseCredentialPath = builder.Configuration["Firebase:CredentialPath"];
+var temp=File.ReadAllText(firebaseCredentialPath);
+if (!string.IsNullOrEmpty(firebaseCredentialPath) && File.Exists(firebaseCredentialPath))
+{
+    FirebaseApp.Create(new AppOptions
+    {
+        Credential = GoogleCredential.FromJson(temp)
+    });
+}
+else
+{
+    // Try to initialize from environment variable or embedded JSON
+    var firebaseJson = builder.Configuration["Firebase:CredentialJson"];
+    if (!string.IsNullOrEmpty(firebaseJson))
+    {
+        FirebaseApp.Create(new AppOptions
+        {
+            Credential = GoogleCredential.FromJson(firebaseJson)
+        });
+    }
+}
+
+// Register notification pushers
+builder.Services.AddScoped<SignalRNotificationPusher>();
+builder.Services.AddScoped<FcmNotificationPusher>();
+builder.Services.AddScoped<INotificationPusher, CompositeNotificationPusher>();
 
 var app = builder.Build();
 

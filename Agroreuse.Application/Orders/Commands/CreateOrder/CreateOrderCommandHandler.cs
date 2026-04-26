@@ -64,6 +64,7 @@ namespace Agroreuse.Application.Orders.Commands.CreateOrder
                 request.SellerId,
                 orderAddress.Id,
                 request.CategoryId,
+                request.Description,
                 request.Quantity,
                 request.NumberOfDays);
 

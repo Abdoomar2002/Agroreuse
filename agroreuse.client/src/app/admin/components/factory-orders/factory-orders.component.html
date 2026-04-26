@@ -77,6 +77,7 @@
       <table *ngIf="filteredOrders.length > 0" class="orders-table">
         <thead>
           <tr>
+            <th>الوصف</th>
             <th>المصنع</th>
             <th>الفئة</th>
             <th>الكمية</th>
@@ -89,6 +90,7 @@
         </thead>
         <tbody>
           <tr *ngFor="let order of filteredOrders">
+            <td>{{ order.description }}</td>
             <td>
               <div class="seller-cell">
                 <div class="seller-avatar factory">{{ order.sellerName.charAt(0) }}</div>

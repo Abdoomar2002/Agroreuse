@@ -37,6 +37,10 @@ namespace Agroreuse.Domain.Entities
         /// Navigation property to Category
         /// </summary>
         public virtual Category Category { get; set; }
+        /// <summary>
+        /// Description of the order (optional)
+        /// </summary>
+        public string Description { get; set; } = string.Empty;
 
         /// <summary>
         /// Quantity of the order
@@ -73,12 +77,14 @@ namespace Agroreuse.Domain.Entities
             string sellerId,
             Guid addressId,
             Guid categoryId,
+            string? description,
             int quantity,
             string numberOfDays) : base()
         {
             SellerId = sellerId;
             AddressId = addressId;
             CategoryId = categoryId;
+            Description = description ?? string.Empty;
             Quantity = quantity;
             NumberOfDays = numberOfDays;
             CreatedAt = DateTime.UtcNow;
@@ -90,12 +96,14 @@ namespace Agroreuse.Domain.Entities
             Guid categoryId,
             int quantity,
             string numberOfDays,
+            string? description,
             OrderStatus status)
         {
             AddressId = addressId;
             CategoryId = categoryId;
             Quantity = quantity;
             NumberOfDays = numberOfDays;
+            Description = description ?? string.Empty;
             Status = status;
         }
 

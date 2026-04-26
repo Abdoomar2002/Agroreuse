@@ -37,6 +37,7 @@ namespace Agroreuse.Application.Orders.Commands.UpdateOrder
                 request.CategoryId,
                 request.Quantity,
                 request.NumberOfDays,
+                request.Description,
                 request.Status);
 
             await _repository.UpdateAsync(order, cancellationToken);

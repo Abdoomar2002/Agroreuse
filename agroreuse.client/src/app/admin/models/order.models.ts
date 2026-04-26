@@ -6,6 +6,7 @@ export interface Order {
   addressDetails: string;
   categoryId: string;
   categoryName: string;
+  description?: string;
   quantity: number;
   numberOfDays: string;
   status: OrderStatus;
@@ -45,6 +46,7 @@ export interface CreateOrderRequest {
   categoryId: string;
   quantity: number;
   numberOfDays: string;
+  description?: string;
   imagePaths?: string[];
 }
 
@@ -60,6 +62,7 @@ export interface UpdateOrderRequest {
   quantity: number;
   numberOfDays: string;
   status: OrderStatus;
+  description?: string;
 }
 
 export interface OrderResponse {

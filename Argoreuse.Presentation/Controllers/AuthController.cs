@@ -153,5 +153,58 @@ namespace WebUI.Controllers
                 AddressDetails = addressDto
             });
         }
+
+        /// <summary>
+        /// Register or update the FCM device token for the authenticated user.
+        /// Call this endpoint when the mobile app receives a new FCM token.
+        /// </summary>
+        [HttpPost("fcm-token")]
+        [Authorize]
+        public async Task<IActionResult> RegisterFcmToken([FromBody] FcmTokenDto model)
+        {
+            if (model == null || string.IsNullOrEmpty(model.Token))
+                return BadRequest(new { message = "FCM token is required." });
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return Unauthorized();
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return NotFound();
+
+            user.FcmDeviceToken = model.Token;
+            var result = await _userManager.UpdateAsync(user);
+
+            if (result.Succeeded)
+                return Ok(new { message = "FCM token registered successfully." });
+
+            return BadRequest(new { message = "Failed to register FCM token." });
+        }
+
+        /// <summary>
+        /// Remove the FCM device token for the authenticated user.
+        /// Call this endpoint when the user logs out from the mobile app.
+        /// </summary>
+        [HttpDelete("fcm-token")]
+        [Authorize]
+        public async Task<IActionResult> RemoveFcmToken()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return Unauthorized();
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return NotFound();
+
+            user.FcmDeviceToken = null;
+            var result = await _userManager.UpdateAsync(user);
+
+            if (result.Succeeded)
+                return Ok(new { message = "FCM token removed successfully." });
+
+            return BadRequest(new { message = "Failed to remove FCM token." });
+        }
     }
 }

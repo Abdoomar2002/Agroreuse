@@ -23,6 +23,11 @@ namespace Agroreuse.Domain.Entities
         public string? ImagePath { get; set; }
 
         /// <summary>
+        /// FCM device token for push notifications to mobile devices
+        /// </summary>
+        public string? FcmDeviceToken { get; set; }
+
+        /// <summary>
         /// Navigation property to Address (one-to-one nullable relationship)
         /// </summary>
         public virtual Address? AddressNavigation { get; set; }

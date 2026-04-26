@@ -50,7 +50,7 @@ namespace Agroreuse.Infrastructure.Persistence.Repositories
         {
             return await DbSet
                 .Include(o => o.Seller)
-                .Include(o => o.Address)
+                .Include(o => o.Address).ThenInclude(a=>a.Government).Include(b=>b.Address).ThenInclude(c=>c.City)
                 .Include(o => o.Category)
                 .Include(o => o.Images)
                 .ToListAsync(cancellationToken);

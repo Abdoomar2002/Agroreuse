@@ -10,6 +10,7 @@ namespace Agroreuse.Application.Orders.Commands.CreateOrder
         string SellerId,
         CreateOrderAddressDto Address,
         Guid CategoryId,
+        string? Description,
         int Quantity,
         string NumberOfDays,
         List<string>? ImagePaths) : ICommand<Guid>;

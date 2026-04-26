@@ -13,6 +13,7 @@ namespace Agroreuse.Application.Orders.DTOs
         string AddressDetails,
         Guid CategoryId,
         string CategoryName,
+        string? Description,
         int Quantity,
         string NumberOfDays,
         OrderStatus Status,

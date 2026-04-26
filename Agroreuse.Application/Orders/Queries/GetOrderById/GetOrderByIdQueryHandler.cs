@@ -31,6 +31,7 @@ namespace Agroreuse.Application.Orders.Queries.GetOrderById
                 order.Address?.Details ?? string.Empty,
                 order.CategoryId,
                 order.Category?.Name ?? string.Empty,
+                order.Description,
                 order.Quantity,
                 order.NumberOfDays,
                 order.Status,

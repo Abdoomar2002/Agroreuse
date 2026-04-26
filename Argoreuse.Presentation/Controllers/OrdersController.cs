@@ -193,7 +193,7 @@ namespace WebUI.Controllers
             {
                 var orders = await _context.Orders
                     .Include(o => o.Seller)
-                    .Include(o => o.Address)
+                    .Include(o => o.Address).ThenInclude(a => a.Government).Include(b => b.Address).ThenInclude(c => c.City)
                     .Include(o => o.Category)
                     .Include(o => o.Images)
                     .Where(o => o.Seller.Type == UserType.Farmer)
@@ -204,9 +204,10 @@ namespace WebUI.Controllers
                         o.SellerId,
                         SellerName = o.Seller.FullName ?? string.Empty,
                         o.AddressId,
-                        AddressDetails = o.Address.Details ?? string.Empty,
+                        AddressDetails =o.Address.Government.Name+" , "+o.Address.City.Name+" , "+ o.Address.Details ?? string.Empty,
                         o.CategoryId,
                         CategoryName = o.Category.Name ?? string.Empty,
+                        o.Description,
                         o.Quantity,
                         o.NumberOfDays,
                         o.Status,
@@ -243,7 +244,7 @@ namespace WebUI.Controllers
             {
                 var orders = await _context.Orders
                     .Include(o => o.Seller)
-                    .Include(o => o.Address)
+                    .Include(o => o.Address).ThenInclude(a => a.Government).Include(b => b.Address).ThenInclude(c => c.City)
                     .Include(o => o.Category)
                     .Include(o => o.Images)
                     .Where(o => o.Seller.Type == UserType.Factory)
@@ -254,9 +255,10 @@ namespace WebUI.Controllers
                         o.SellerId,
                         SellerName = o.Seller.FullName ?? string.Empty,
                         o.AddressId,
-                        AddressDetails = o.Address.Details ?? string.Empty,
+                        AddressDetails = o.Address.Government.Name + " , " + o.Address.City.Name + " , " + o.Address.Details ?? string.Empty,
                         o.CategoryId,
                         CategoryName = o.Category.Name ?? string.Empty,
+                        o.Description,
                         o.Quantity,
                         o.NumberOfDays,
                         o.Status,
@@ -422,6 +424,7 @@ namespace WebUI.Controllers
                     userId,
                     addressDto,
                     request.CategoryId,
+                    request.Description,
                     request.Quantity,
                     request.NumberOfDays,
                     request.ImagePaths);
@@ -465,6 +468,7 @@ namespace WebUI.Controllers
                     id,
                     request.AddressId,
                     request.CategoryId,
+                    request.Description,
                     request.Quantity,
                     request.NumberOfDays,
                     request.Status);
@@ -803,6 +807,7 @@ namespace WebUI.Controllers
         public Guid CategoryId { get; set; }
         public int Quantity { get; set; }
         public string NumberOfDays { get; set; }
+        public string? Description { get; set; } = null;
         public List<string>? ImagePaths { get; set; }
     }
 
@@ -823,6 +828,7 @@ namespace WebUI.Controllers
     {
         public Guid AddressId { get; set; }
         public Guid CategoryId { get; set; }
+        public string? Description { get; set; } = null;
         public int Quantity { get; set; }
         public string NumberOfDays { get; set; }
         public OrderStatus Status { get; set; }
