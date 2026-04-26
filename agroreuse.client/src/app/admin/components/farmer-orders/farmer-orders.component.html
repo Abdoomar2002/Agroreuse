@@ -159,6 +159,10 @@
             <label>العنوان</label>
             <p>{{ selectedOrder.addressDetails }}</p>
           </div>
+          <div class="detail-item full-width">
+            <label>الوصف</label>
+            <p>{{selectedOrder.description}}</p>
+          </div>
           <div class="detail-item">
             <label>الحالة</label>
             <span class="status-badge" [style.background]="getStatusColor(selectedOrder.status)">
