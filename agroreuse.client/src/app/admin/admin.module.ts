@@ -14,6 +14,7 @@ import { FarmerOrdersComponent } from './components/farmer-orders/farmer-orders.
 import { FactoryOrdersComponent } from './components/factory-orders/factory-orders.component';
 import { AnalyticsComponent } from './components/analytics/analytics.component';
 import { NotificationsDropdownComponent } from './components/notifications-dropdown/notifications-dropdown.component';
+import { ToastComponent } from './components/toast/toast.component';
 import { AdminAuthGuard } from './guards/admin-auth.guard';
 
 const routes: Routes = [
@@ -50,7 +51,8 @@ const routes: Routes = [
     FarmerOrdersComponent,
     FactoryOrdersComponent,
     AnalyticsComponent,
-    NotificationsDropdownComponent
+    NotificationsDropdownComponent,
+    ToastComponent
   ],
   imports: [
     CommonModule,

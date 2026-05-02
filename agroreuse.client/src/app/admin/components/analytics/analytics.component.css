@@ -170,11 +170,18 @@
   .charts-row { grid-template-columns: 1fr; }
 }
 @media (max-width: 768px) {
-  .stats-grid { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .filters-bar { flex-direction: column; }
   .search-box { min-width: unset; width: 100%; }
   .filter-group { width: 100%; }
-  .filter-group select, .filter-group input[type="date"] { width: 100%; }
+  .filter-group select, .filter-group input[type="date"] { width: 100%; min-width: unset; }
   .results-stats { flex-direction: column; gap: 16px; }
   .bar-chart { height: 150px; }
+  .table-container { overflow-x: auto; }
+  .data-table { min-width: 700px; }
+}
+@media (max-width: 480px) {
+  .stats-grid { grid-template-columns: 1fr; }
+  .stat-value { font-size: 22px; }
+  .result-value { font-size: 20px; }
 }

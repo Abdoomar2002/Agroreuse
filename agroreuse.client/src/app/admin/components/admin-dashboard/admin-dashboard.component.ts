@@ -14,6 +14,7 @@ type ViewType = 'users' | 'governments' | 'categories' | 'contact' | 'orders' | 
 export class AdminDashboardComponent implements OnInit, OnDestroy {
   currentUser: AdminUser | null = null;
   currentView: ViewType = 'users';
+  sidebarOpen = false;
 
   constructor(
     private authService: AdminAuthService,
@@ -39,6 +40,15 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
   navigateTo(view: ViewType): void {
     this.currentView = view;
+    this.sidebarOpen = false;
+  }
+
+  toggleSidebar(): void {
+    this.sidebarOpen = !this.sidebarOpen;
+  }
+
+  closeSidebar(): void {
+    this.sidebarOpen = false;
   }
 
   logout(): void {

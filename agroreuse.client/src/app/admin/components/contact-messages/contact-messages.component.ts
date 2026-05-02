@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ContactService } from '../../services/contact.service';
 import { ContactMessage } from '../../models/contact.models';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-contact-messages',
@@ -14,14 +15,25 @@ export class ContactMessagesComponent implements OnInit {
   error = '';
   selectedMessage: ContactMessage | null = null;
 
+  // Respond modal
+  showRespondModal = false;
+  respondingMessage: ContactMessage | null = null;
+  responseText = '';
+  respondLoading = false;
+  respondError = '';
+
+  // Action loading states
+  markingReadId: string | null = null;
+  deletingId: string | null = null;
+
   // Filters
   filterStatus: 'all' | 'answered' | 'unanswered' = 'all';
-  filterUserType: 'all' | 0 | 1 = 'all'; // 0=Farmer, 1=Factory
-  filterContactType: 'all' | 0 | 1 | 2 | 3 = 'all'; // 0=General, 1=Issue, 2=Suggest, 3=Complaint
+  filterUserType: 'all' | 0 | 1 = 'all';
+  filterContactType: 'all' | 0 | 1 | 2 | 3 = 'all';
   filterDateFrom = '';
   filterDateTo = '';
 
-  constructor(private contactService: ContactService) {}
+  constructor(private contactService: ContactService, private toast: ToastService) {}
 
   ngOnInit(): void {
     this.loadMessages();
@@ -46,24 +58,20 @@ export class ContactMessagesComponent implements OnInit {
   applyFilters(): void {
     let result = [...this.allMessages];
 
-    // Filter by answered status
     if (this.filterStatus === 'answered') {
       result = result.filter(m => m.adminResponse);
     } else if (this.filterStatus === 'unanswered') {
       result = result.filter(m => !m.adminResponse);
     }
 
-    // Filter by user type
     if (this.filterUserType !== 'all') {
       result = result.filter(m => Number(m.userType) === this.filterUserType);
     }
 
-    // Filter by contact type
     if (this.filterContactType !== 'all') {
       result = result.filter(m => Number(m.contactType) === this.filterContactType);
     }
 
-    // Filter by date range
     if (this.filterDateFrom) {
       const from = new Date(this.filterDateFrom);
       result = result.filter(m => new Date(m.submittedAt) >= from);
@@ -77,9 +85,7 @@ export class ContactMessagesComponent implements OnInit {
     this.filteredMessages = result;
   }
 
-  onFilterChange(): void {
-    this.applyFilters();
-  }
+  onFilterChange(): void { this.applyFilters(); }
 
   clearFilters(): void {
     this.filterStatus = 'all';
@@ -94,7 +100,86 @@ export class ContactMessagesComponent implements OnInit {
     this.selectedMessage = this.selectedMessage?.id === msg.id ? null : msg;
   }
 
-  // Analytics
+  // ── Mark as read ──────────────────────────────────────────────────────────
+  markAsRead(msg: ContactMessage, event: Event): void {
+    event.stopPropagation();
+    if (msg.isRead) return;
+    this.markingReadId = msg.id;
+    this.contactService.markAsRead(msg.id).subscribe({
+      next: () => {
+        msg.isRead = true;
+        this.markingReadId = null;
+        if (this.selectedMessage?.id === msg.id) {
+          this.selectedMessage = { ...msg, isRead: true };
+        }
+        this.toast.success('تم تعيين الرسالة كمقروءة');
+      },
+      error: () => { this.markingReadId = null; this.toast.error('فشل تحديث حالة القراءة'); }
+    });
+  }
+
+  // ── Respond modal ─────────────────────────────────────────────────────────
+  openRespondModal(msg: ContactMessage, event: Event): void {
+    event.stopPropagation();
+    this.respondingMessage = msg;
+    this.responseText = msg.adminResponse ?? '';
+    this.respondError = '';
+    this.showRespondModal = true;
+  }
+
+  closeRespondModal(): void {
+    this.showRespondModal = false;
+    this.respondingMessage = null;
+    this.responseText = '';
+    this.respondError = '';
+  }
+
+  submitResponse(): void {
+    if (!this.responseText.trim() || !this.respondingMessage) return;
+    this.respondLoading = true;
+    this.respondError = '';
+    this.contactService.respondToMessage(this.respondingMessage.id, this.responseText.trim()).subscribe({
+      next: (res) => {
+        const updated: ContactMessage = res?.data ?? {
+          ...this.respondingMessage!,
+          adminResponse: this.responseText.trim(),
+          respondedAt: new Date().toISOString(),
+          isRead: true
+        };
+        const idx = this.allMessages.findIndex(m => m.id === updated.id);
+        if (idx !== -1) this.allMessages[idx] = updated;
+        if (this.selectedMessage?.id === updated.id) this.selectedMessage = updated;
+        this.applyFilters();
+        this.respondLoading = false;
+        this.closeRespondModal();
+        this.toast.success('تم إرسال الرد بنجاح وسيتلقى المستخدم إشعارًا');
+      },
+      error: () => {
+        this.respondError = 'فشل إرسال الرد. حاول مرة أخرى.';
+        this.respondLoading = false;
+        this.toast.error('فشل إرسال الرد. حاول مرة أخرى.');
+      }
+    });
+  }
+
+  // ── Delete ────────────────────────────────────────────────────────────────
+  deleteMessage(msg: ContactMessage, event: Event): void {
+    event.stopPropagation();
+    if (!confirm('هل أنت متأكد من حذف هذه الرسالة؟')) return;
+    this.deletingId = msg.id;
+    this.contactService.deleteMessage(msg.id).subscribe({
+      next: () => {
+        this.allMessages = this.allMessages.filter(m => m.id !== msg.id);
+        if (this.selectedMessage?.id === msg.id) this.selectedMessage = null;
+        this.applyFilters();
+        this.deletingId = null;
+        this.toast.success('تم حذف الرسالة بنجاح');
+      },
+      error: () => { this.deletingId = null; this.toast.error('فشل حذف الرسالة'); }
+    });
+  }
+
+  // ── Analytics ─────────────────────────────────────────────────────────────
   get totalCount(): number { return this.allMessages.length; }
   get answeredCount(): number { return this.allMessages.filter(m => m.adminResponse).length; }
   get unansweredCount(): number { return this.allMessages.filter(m => !m.adminResponse).length; }
@@ -118,7 +203,8 @@ export class ContactMessagesComponent implements OnInit {
     return map[String(type)] || String(type);
   }
 
-  formatDate(date: string): string {
+  formatDate(date?: string): string {
+    if (!date) return '';
     return new Date(date).toLocaleDateString('ar-EG', {
       year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
     });

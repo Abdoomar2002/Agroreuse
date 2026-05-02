@@ -23,4 +23,18 @@ export class ContactService {
   getMessage(id: string): Observable<ContactMessage> {
     return this.http.get<ContactMessage>(`${this.API_URL}/${id}`);
   }
+
+  markAsRead(id: string): Observable<any> {
+    return this.http.put(`${this.API_URL}/${id}/mark-read`, {});
+  }
+
+  respondToMessage(id: string, response: string): Observable<any> {
+    return this.http.put(`${this.API_URL}/${id}/respond`, JSON.stringify(response), {
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
+  deleteMessage(id: string): Observable<any> {
+    return this.http.delete(`${this.API_URL}/${id}`);
+  }
 }

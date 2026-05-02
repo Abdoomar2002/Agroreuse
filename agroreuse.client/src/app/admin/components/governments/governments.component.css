@@ -121,7 +121,16 @@
 /* Responsive */
 @media (max-width: 768px) {
   .page-header { flex-direction: column; gap: 16px; align-items: stretch; }
+  .add-btn { justify-content: center; }
+  .add-form { flex-direction: column; }
+  .add-form input { width: 100%; }
   .table-container { overflow-x: auto; }
   .data-table { min-width: 500px; }
   .modal-content { max-width: 100%; margin: 10px; }
+  .edit-input { width: 100%; max-width: unset; }
+}
+@media (max-width: 480px) {
+  .modal-body { padding: 16px; }
+  .modal-header { padding: 16px; }
+  .cities-table th, .cities-table td { padding: 10px 12px; }
 }

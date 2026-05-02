@@ -77,12 +77,12 @@
       <table *ngIf="filteredOrders.length > 0" class="orders-table">
         <thead>
           <tr>
-            <th>الوصف</th>
-            <th>المزارع</th>
+            <th>البائع</th>
             <th>الفئة</th>
             <th>الكمية</th>
             <th>المدة</th>
             <th>العنوان</th>
+            <th>الوصف</th>
             <th>الحالة</th>
             <th>التاريخ</th>
             <th>الإجراءات</th>
@@ -90,7 +90,6 @@
         </thead>
         <tbody>
           <tr *ngFor="let order of filteredOrders">
-            <td>{{ order.description }}</td>
             <td>
               <div class="seller-cell">
                 <div class="seller-avatar farmer">{{ order.sellerName.charAt(0) }}</div>
@@ -101,13 +100,13 @@
             <td>{{ order.quantity }} طن</td>
             <td>{{ order.numberOfDays }} أسبوع</td>
             <td class="address-cell" [title]="order.addressDetails">{{ order.addressDetails }}</td>
+            <td class="truncate-cell" [title]="order.description">{{ order.description!=null && order.description.length > 30 ? (order.description | slice:0:30) + '...' : order.description }}</td>
             <td>
-              <select 
-                class="status-select" 
-                [style.--status-color]="getStatusColor(order.status)"
-                [ngModel]="order.status" 
-                (ngModelChange)="updateOrderStatus(order, $event)"
-                [disabled]="updatingOrderId === order.id">
+              <select class="status-select"
+                      [style.--status-color]="getStatusColor(order.status)"
+                      [ngModel]="order.status"
+                      (ngModelChange)="updateOrderStatus(order, $event)"
+                      [disabled]="updatingOrderId === order.id">
                 <option *ngFor="let opt of statusOptions" [ngValue]="opt.value">{{ opt.label }}</option>
               </select>
             </td>
@@ -115,10 +114,10 @@
             <td>
               <div class="action-buttons">
                 <button class="action-btn view" (click)="viewOrderDetails(order)" title="عرض التفاصيل">
-                  <svg viewBox="0 0 24 24" fill="none"><path d="M1 12S5 4 12 4S23 12 23 12S19 20 12 20S1 12 1 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/></svg>
+                  <svg viewBox="0 0 24 24" fill="none"><path d="M1 12S5 4 12 4S23 12 23 12S19 20 12 20S1 12 1 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" /></svg>
                 </button>
                 <button class="action-btn delete" (click)="deleteOrder(order)" title="حذف">
-                  <svg viewBox="0 0 24 24" fill="none"><path d="M3 6H5H21M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 24 24" fill="none"><path d="M3 6H5H21M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
                 </button>
               </div>
             </td>

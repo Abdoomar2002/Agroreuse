@@ -17,15 +17,18 @@ namespace WebUI.Controllers
         private readonly ArgoreuseContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IEmailService _emailService;
+        private readonly INotificationService _notificationService;
 
         public ContactUsController(
             ArgoreuseContext context,
             UserManager<ApplicationUser> userManager,
-            IEmailService emailService)
+            IEmailService emailService,
+            INotificationService notificationService)
         {
             _context = context;
             _userManager = userManager;
             _emailService = emailService;
+            _notificationService = notificationService;
         }
 
         /// <summary>
@@ -225,6 +228,18 @@ Agroreuse Team
 
             await _emailService.SendEmailAsync(message.UserEmail, emailSubject, emailBody);
 
+            // Send real-time notification to the user via SignalR
+            if (!string.IsNullOrEmpty(message.UserId))
+            {
+                var notification = new Notification
+                {
+                    RecipientId = message.UserId,
+                    Title = "رد على رسالتك",
+                    Message = $"تم الرد على رسالتك من نوع '{GetContactTypeLabel(message.ContactType)}'. يمكنك الاطلاع على الرد الآن."
+                };
+                await _notificationService.CreateAndSendAsync(notification);
+            }
+
             return Ok(new
             {
                 Success = true,
@@ -299,5 +314,14 @@ Agroreuse Team
 
             return Ok(new { Success = true, Message = "Message deleted successfully." });
         }
+
+        private static string GetContactTypeLabel(object contactType) => contactType?.ToString() switch
+        {
+            "0" or "General"   => "عام",
+            "1" or "Issue"     => "مشكلة",
+            "2" or "Suggest"   => "اقتراح",
+            "3" or "Complaint" => "شكوى",
+            _                  => contactType?.ToString() ?? "تواصل"
+        };
     }
 }

@@ -120,9 +120,13 @@
 }
 
 /* Responsive */
-@media (max-width: 640px) {
-  .categories-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+@media (max-width: 768px) {
+  .categories-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .page-header { flex-direction: column; gap: 12px; align-items: stretch; }
+  .add-btn { justify-content: center; }
   .form-row { flex-direction: column; }
   .form-row input[type="text"] { min-width: unset; width: 100%; }
-  .page-header { flex-direction: column; gap: 12px; align-items: stretch; }
+}
+@media (max-width: 400px) {
+  .categories-grid { grid-template-columns: 1fr; }
 }
