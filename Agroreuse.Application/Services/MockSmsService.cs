@@ -27,5 +27,16 @@ namespace Agroreuse.Application.Services
             // Simulate successful send
             return Task.FromResult(true);
         }
+
+        public Task<bool> SendOtpAsync(string phoneNumber, string otp)
+        {
+            _logger.LogInformation("===========================================");
+            _logger.LogInformation("MOCK SMS SERVICE - OTP Details:");
+            _logger.LogInformation("To: {PhoneNumber}", phoneNumber);
+            _logger.LogInformation("OTP: {Otp}", otp);
+            _logger.LogInformation("===========================================");
+
+            return Task.FromResult(true);
+        }
     }
 }

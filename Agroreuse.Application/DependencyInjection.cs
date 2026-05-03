@@ -21,9 +21,6 @@ public static class DependencyInjection
 
         services.AddScoped<IJwtTokenService, JwtTokenService>();
         services.AddScoped<IOtpService, OtpService>();
-        
-        // Register Mock SMS Service (replace with real implementation when ready)
-        services.AddScoped<ISmsService, MockSmsService>();
 
         return services;
     }

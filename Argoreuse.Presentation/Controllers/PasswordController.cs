@@ -59,13 +59,12 @@ namespace WebUI.Controllers
             otp = _otpService.GenerateOtp(request.Email);
             else if(user.Type==Agroreuse.Domain.Enums.UserType.Farmer)
              otp = _otpService.GenerateOtp(request.Phone);
-            
-                // Send OTP via SMS
-                var smsMessage = $"Your Agroreuse password reset OTP is: {otp}. Valid for 5 minutes.";
+
+            // Send OTP via SMS MISR
             if(user.Type==Agroreuse.Domain.Enums.UserType.Factory)
-                await _smsService.SendSmsAsync(user.Email, smsMessage);
+                await _smsService.SendOtpAsync(user.PhoneNumber ?? user.Email, otp);
             else if(user.Type==Agroreuse.Domain.Enums.UserType.Farmer)
-                await _smsService.SendSmsAsync(user.PhoneNumber, smsMessage);
+                await _smsService.SendOtpAsync(user.PhoneNumber, otp);
 
             var target = user.Type==Agroreuse.Domain.Enums.UserType.Factory ? "email" : "phone number";
             var response = new ForgotPasswordResponseDto
