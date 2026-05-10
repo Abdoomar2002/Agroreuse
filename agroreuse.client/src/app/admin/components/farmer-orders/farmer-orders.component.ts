@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { OrderService } from '../../services/order.service';
 import { Order, OrderStatus, OrderStatusLabels, OrderStatusColors } from '../../models/order.models';
 import { environment } from '../../../../environments/environment';
+import { SortUtil, SortDirection } from '../../utilities/sort.util';
 
 @Component({
   selector: 'app-farmer-orders',
@@ -18,6 +19,10 @@ export class FarmerOrdersComponent implements OnInit {
   statusFilter: OrderStatus | 'all' = 'all';
   searchQuery = '';
 
+  // Sorting
+  sortColumn: keyof Order | null = null;
+  sortDirection: SortDirection = null;
+
   // View detail state
   selectedOrder: Order | null = null;
   showDetailModal = false;
@@ -30,10 +35,7 @@ export class FarmerOrdersComponent implements OnInit {
     { value: OrderStatus.Pending, label: OrderStatusLabels[OrderStatus.Pending] },
     { value: OrderStatus.Approved, label: OrderStatusLabels[OrderStatus.Approved] },
     { value: OrderStatus.Rejected, label: OrderStatusLabels[OrderStatus.Rejected] },
-    { value: OrderStatus.InProgress, label: OrderStatusLabels[OrderStatus.InProgress] },
-    { value: OrderStatus.Completed, label: OrderStatusLabels[OrderStatus.Completed] },
-    { value: OrderStatus.Cancelled, label: OrderStatusLabels[OrderStatus.Cancelled] }
-  ];
+    ];
 
   constructor(private orderService: OrderService) {}
 
@@ -76,12 +78,33 @@ export class FarmerOrdersComponent implements OnInit {
       );
     }
 
+    // Apply sorting
+    if (this.sortColumn) {
+      result = SortUtil.sort(result, this.sortColumn, this.sortDirection, this.sortColumn, this.sortDirection);
+    }
+
     this.filteredOrders = result;
   }
 
   onStatusFilterChange(status: OrderStatus | 'all'): void {
     this.statusFilter = status;
     this.applyFilters();
+  }
+
+  onSort(column: keyof Order): void {
+    const newSortState = SortUtil.toggleSort(column as string, this.sortColumn as string | null, this.sortDirection);
+    this.sortColumn = newSortState.column as keyof Order | null;
+    this.sortDirection = newSortState.direction;
+    this.applyFilters();
+  }
+
+  isSortedBy(column: keyof Order): boolean {
+    return this.sortColumn === column;
+  }
+
+  getSortIcon(column: keyof Order): string {
+    if (this.sortColumn !== column) return '⇅';
+    return this.sortDirection === 'asc' ? '↑' : '↓';
   }
 
   onSearchChange(): void {

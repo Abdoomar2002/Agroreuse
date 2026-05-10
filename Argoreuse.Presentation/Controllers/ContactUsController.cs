@@ -84,7 +84,7 @@ Message ID: {contactMessage.Id}
 ";
 
             // Send email to admin (use a config value for admin email)
-            await _emailService.SendEmailAsync("admin@agroreuse.com", emailSubject, emailBody);
+            await _emailService.SendEmailAsync("support@sifsafeg.com", emailSubject, emailBody);
 
             return Ok(new
             {

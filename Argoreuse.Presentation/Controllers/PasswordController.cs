@@ -15,17 +15,20 @@ namespace WebUI.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IOtpService _otpService;
         private readonly ISmsService _smsService;
+        private readonly IEmailService _emailService;
         private readonly IHostEnvironment _environment;
 
         public PasswordController(
             UserManager<ApplicationUser> userManager,
             IOtpService otpService,
             ISmsService smsService,
+            IEmailService emailService,
             IHostEnvironment environment)
         {
             _userManager = userManager;
             _otpService = otpService;
             _smsService = smsService;
+            _emailService = emailService;
             _environment = environment;
         }
 
@@ -60,9 +63,9 @@ namespace WebUI.Controllers
             else if(user.Type==Agroreuse.Domain.Enums.UserType.Farmer)
              otp = _otpService.GenerateOtp(request.Phone);
 
-            // Send OTP via SMS MISR
+            // Send OTP via Email for Factory, SMS for Farmer
             if(user.Type==Agroreuse.Domain.Enums.UserType.Factory)
-                await _smsService.SendOtpAsync(user.PhoneNumber ?? user.Email, otp);
+                await _emailService.SendEmailAsync(user.Email, "Your OTP Code", $"Your OTP code is: {otp}");
             else if(user.Type==Agroreuse.Domain.Enums.UserType.Farmer)
                 await _smsService.SendOtpAsync(user.PhoneNumber, otp);
 
@@ -74,9 +77,6 @@ namespace WebUI.Controllers
             };
 
             // Include OTP in response only in development mode for testing
-           
-                response.DebugOtp = otp;
-                response.Message += " (Debug: OTP included in response for testing)";
            
 
             return Ok(response);

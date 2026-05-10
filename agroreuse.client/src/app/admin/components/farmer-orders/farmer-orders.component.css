@@ -75,6 +75,16 @@
 .orders-table th {
   background: #fafafa; font-weight: 600; font-size: 13px; color: #5f6368;
 }
+.orders-table th.sortable {
+  cursor: pointer; user-select: none; transition: background 0.15s;
+ 
+}
+.orders-table th.sortable:hover { background: #f0f0f0; }
+.orders-table th.sorted { background: #e8f5e9; color: #2e7d32; }
+.sort-icon {
+  opacity: 0.6; font-size: 12px; transition: opacity 0.15s;
+}
+.orders-table th.sorted .sort-icon { opacity: 1; }
 .orders-table td { font-size: 14px; color: #1f1f1f; }
 .orders-table tr:hover { background: #fafafa; }
 

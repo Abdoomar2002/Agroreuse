@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { UsersService } from '../../services/users.service';
 import { User } from '../../models/user.models';
+import { SortUtil, SortDirection } from '../../utilities/sort.util';
 
 @Component({
   selector: 'app-users-management',
@@ -17,6 +18,10 @@ export class UsersManagementComponent implements OnInit {
   searchQuery = '';
   selectedType: 'all' | 0 | 1 = 'all'; // 0=Farmer, 1=Factory
   selectedStatus: 'all' | 'active' | 'locked' = 'all';
+
+  // Sorting
+  sortColumn: keyof User | null = null;
+  sortDirection: SortDirection = null;
 
   // Block status update
   updatingUserId: string | null = null;
@@ -71,6 +76,11 @@ export class UsersManagementComponent implements OnInit {
       );
     }
 
+    // Apply sorting
+    if (this.sortColumn) {
+      result = SortUtil.sort(result, this.sortColumn, this.sortDirection, this.sortColumn, this.sortDirection);
+    }
+
     this.filteredUsers = result;
   }
 
@@ -86,6 +96,22 @@ export class UsersManagementComponent implements OnInit {
   onStatusChange(status: 'all' | 'active' | 'locked'): void {
     this.selectedStatus = status;
     this.applyFilters();
+  }
+
+  onSort(column: keyof User): void {
+    const newSortState = SortUtil.toggleSort(column as string, this.sortColumn as string | null, this.sortDirection);
+    this.sortColumn = newSortState.column as keyof User | null;
+    this.sortDirection = newSortState.direction;
+    this.applyFilters();
+  }
+
+  isSortedBy(column: keyof User): boolean {
+    return this.sortColumn === column;
+  }
+
+  getSortIcon(column: keyof User): string {
+    if (this.sortColumn !== column) return '⇅';
+    return this.sortDirection === 'asc' ? '↑' : '↓';
   }
 
   toggleBlockStatus(user: User): void {

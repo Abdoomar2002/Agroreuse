@@ -39,8 +39,8 @@ public static class DependencyInjection
         services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddScoped<INotificationService, NotificationService>();
 
-        // Register email service (mock for now)
-        services.AddScoped<IEmailService, MockEmailService>();
+        // Register email service (SMTP for production)
+        services.AddScoped<IEmailService, SmtpEmailService>();
 
         // Register SMS service (SMS MISR OTP API)
         services.AddHttpClient();

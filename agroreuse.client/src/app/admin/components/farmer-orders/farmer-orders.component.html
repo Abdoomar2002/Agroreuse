@@ -77,14 +77,30 @@
       <table *ngIf="filteredOrders.length > 0" class="orders-table">
         <thead>
           <tr>
-            <th>البائع</th>
-            <th>الفئة</th>
-            <th>الكمية</th>
-            <th>المدة</th>
-            <th>العنوان</th>
-            <th>الوصف</th>
-            <th>الحالة</th>
-            <th>التاريخ</th>
+            <th class="sortable" (click)="onSort('sellerName')" [class.sorted]="isSortedBy('sellerName')">
+              البائع <span class="sort-icon">{{ getSortIcon('sellerName') }}</span>
+            </th>
+            <th class="sortable" (click)="onSort('categoryName')" [class.sorted]="isSortedBy('categoryName')">
+              الفئة <span class="sort-icon">{{ getSortIcon('categoryName') }}</span>
+            </th>
+            <th class="sortable" (click)="onSort('quantity')" [class.sorted]="isSortedBy('quantity')">
+              الكمية <span class="sort-icon">{{ getSortIcon('quantity') }}</span>
+            </th>
+            <th class="sortable" (click)="onSort('numberOfDays')" [class.sorted]="isSortedBy('numberOfDays')">
+              المدة <span class="sort-icon">{{ getSortIcon('numberOfDays') }}</span>
+            </th>
+            <th class="sortable" (click)="onSort('addressDetails')" [class.sorted]="isSortedBy('addressDetails')">
+              العنوان <span class="sort-icon">{{ getSortIcon('addressDetails') }}</span>
+            </th>
+            <th class="sortable" (click)="onSort('description')" [class.sorted]="isSortedBy('description')">
+              الوصف <span class="sort-icon">{{ getSortIcon('description') }}</span>
+            </th>
+            <th class="sortable" (click)="onSort('status')" [class.sorted]="isSortedBy('status')">
+              الحالة <span class="sort-icon">{{ getSortIcon('status') }}</span>
+            </th>
+            <th class="sortable" (click)="onSort('createdAt')" [class.sorted]="isSortedBy('createdAt')">
+              التاريخ <span class="sort-icon">{{ getSortIcon('createdAt') }}</span>
+            </th>
             <th>الإجراءات</th>
           </tr>
         </thead>

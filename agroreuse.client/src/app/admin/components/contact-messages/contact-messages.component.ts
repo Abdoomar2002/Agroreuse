@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ContactService } from '../../services/contact.service';
 import { ContactMessage } from '../../models/contact.models';
 import { ToastService } from '../../services/toast.service';
+import { SortUtil, SortDirection } from '../../utilities/sort.util';
 
 @Component({
   selector: 'app-contact-messages',
@@ -32,6 +33,10 @@ export class ContactMessagesComponent implements OnInit {
   filterContactType: 'all' | 0 | 1 | 2 | 3 = 'all';
   filterDateFrom = '';
   filterDateTo = '';
+
+  // Sorting
+  sortColumn: keyof ContactMessage | null = null;
+  sortDirection: SortDirection = null;
 
   constructor(private contactService: ContactService, private toast: ToastService) {}
 
@@ -82,6 +87,11 @@ export class ContactMessagesComponent implements OnInit {
       result = result.filter(m => new Date(m.submittedAt) <= to);
     }
 
+    // Apply sorting
+    if (this.sortColumn) {
+      result = SortUtil.sort(result, this.sortColumn, this.sortDirection, this.sortColumn, this.sortDirection);
+    }
+
     this.filteredMessages = result;
   }
 
@@ -94,6 +104,22 @@ export class ContactMessagesComponent implements OnInit {
     this.filterDateFrom = '';
     this.filterDateTo = '';
     this.applyFilters();
+  }
+
+  onSort(column: keyof ContactMessage): void {
+    const newSortState = SortUtil.toggleSort(column as string, this.sortColumn as string | null, this.sortDirection);
+    this.sortColumn = newSortState.column as keyof ContactMessage | null;
+    this.sortDirection = newSortState.direction;
+    this.applyFilters();
+  }
+
+  isSortedBy(column: keyof ContactMessage): boolean {
+    return this.sortColumn === column;
+  }
+
+  getSortIcon(column: keyof ContactMessage): string {
+    if (this.sortColumn !== column) return '⇅';
+    return this.sortDirection === 'asc' ? '↑' : '↓';
   }
 
   selectMessage(msg: ContactMessage): void {

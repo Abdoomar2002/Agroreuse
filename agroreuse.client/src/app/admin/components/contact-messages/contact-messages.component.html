@@ -79,13 +79,27 @@
         <thead>
           <tr>
             <th>#</th>
-            <th>المرسل</th>
-            <th>البريد</th>
-            <th>نوع المستخدم</th>
-            <th>نوع الرسالة</th>
-            <th>الرسالة</th>
-            <th>التاريخ</th>
-            <th>الحالة</th>
+            <th class="sortable" (click)="onSort('userName')" [class.sorted]="isSortedBy('userName')">
+              المرسل <span class="sort-icon">{{ getSortIcon('userName') }}</span>
+            </th>
+            <th class="sortable" (click)="onSort('userEmail')" [class.sorted]="isSortedBy('userEmail')">
+              البريد <span class="sort-icon">{{ getSortIcon('userEmail') }}</span>
+            </th>
+            <th class="sortable" (click)="onSort('userType')" [class.sorted]="isSortedBy('userType')">
+              نوع المستخدم <span class="sort-icon">{{ getSortIcon('userType') }}</span>
+            </th>
+            <th class="sortable" (click)="onSort('contactType')" [class.sorted]="isSortedBy('contactType')">
+              نوع الرسالة <span class="sort-icon">{{ getSortIcon('contactType') }}</span>
+            </th>
+            <th class="sortable" (click)="onSort('message')" [class.sorted]="isSortedBy('message')">
+              الرسالة <span class="sort-icon">{{ getSortIcon('message') }}</span>
+            </th>
+            <th class="sortable" (click)="onSort('submittedAt')" [class.sorted]="isSortedBy('submittedAt')">
+              التاريخ <span class="sort-icon">{{ getSortIcon('submittedAt') }}</span>
+            </th>
+            <th class="sortable" (click)="onSort('adminResponse')" [class.sorted]="isSortedBy('adminResponse')">
+              الحالة <span class="sort-icon">{{ getSortIcon('adminResponse') }}</span>
+            </th>
             <th>الإجراءات</th>
           </tr>
         </thead>

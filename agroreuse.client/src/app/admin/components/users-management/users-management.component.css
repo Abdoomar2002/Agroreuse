@@ -69,6 +69,16 @@
 .data-table th {
   padding: 14px 16px; text-align: right; font-weight: 600; white-space: nowrap;
 }
+.data-table th.sortable {
+  cursor: pointer; user-select: none; transition: background 0.15s;
+ /**/
+}
+.data-table th.sortable:hover { background: rgba(255, 255, 255, 0.1); }
+.data-table th.sorted { background: rgba(255, 255, 255, 0.15); }
+.sort-icon {
+  opacity: 0.6; font-size: 12px; transition: opacity 0.15s;
+}
+.data-table th.sorted .sort-icon { opacity: 1; }
 .data-table tbody tr { border-bottom: 1px solid #f0f0f0; transition: background 0.15s; }
 .data-table tbody tr:hover { background: #f9faf8; }
 .data-table td { padding: 14px 16px; vertical-align: middle; }

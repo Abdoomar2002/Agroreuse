@@ -43,10 +43,7 @@ export class AnalyticsComponent implements OnInit {
     { value: OrderStatus.Pending, label: OrderStatusLabels[OrderStatus.Pending] },
     { value: OrderStatus.Approved, label: OrderStatusLabels[OrderStatus.Approved] },
     { value: OrderStatus.Rejected, label: OrderStatusLabels[OrderStatus.Rejected] },
-    { value: OrderStatus.InProgress, label: OrderStatusLabels[OrderStatus.InProgress] },
-    { value: OrderStatus.Completed, label: OrderStatusLabels[OrderStatus.Completed] },
-    { value: OrderStatus.Cancelled, label: OrderStatusLabels[OrderStatus.Cancelled] }
-  ];
+ ];
 
   constructor(
     private analyticsService: AdminAnalyticsService,
