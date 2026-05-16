@@ -23,4 +23,7 @@ export class UsersService {
   setUserBlockStatus(userId: string, isBlocked: boolean): Observable<any> {
     return this.http.put(`${this.API_URL}/${userId}/block`, { isBlocked });
   }
+  resetUserPassword(userId: string): Observable<any> {
+    return this.http.put(`${this.API_URL}/${userId}/reset-password`, {} );
+  }
 }

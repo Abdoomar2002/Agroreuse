@@ -81,12 +81,13 @@
             <th class="sortable" (click)="onSort('isLocked')" [class.sorted]="isSortedBy('isLocked')">
               الحالة <span class="sort-icon">{{ getSortIcon('isLocked') }}</span>
             </th>
+            <th>إعادة تعيين كلمة المرور</th>
             <th>إجراءات</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngIf="filteredUsers.length === 0">
-            <td colspan="9" class="empty-row">لا توجد نتائج</td>
+            <td colspan="10" class="empty-row">لا توجد نتائج</td>
           </tr>
           <tr *ngFor="let user of filteredUsers; let i = index">
             <td class="row-num">{{ i + 1 }}</td>
@@ -97,6 +98,16 @@
             <td class="address-cell">{{ user.address || '-' }}</td>
             <td>{{ formatDate(user.createdAt) }}</td>
             <td><span class="status-badge" [class.active]="!user.isLocked" [class.locked]="user.isLocked">{{ user.isLocked ? 'محظور' : 'نشط' }}</span></td>
+            <td>
+              <button 
+                class="action-btn reset-password-btn"
+                [disabled]="updatingUserId === user.id || user.type === 2"
+                (click)="resetUserPassword(user)"
+                [title]="user.type === 2 ? 'لا يمكن إعادة تعيين كلمة المرور للمسؤول' : 'إعادة تعيين كلمة المرور'">
+                <span *ngIf="updatingUserId === user.id">...</span>
+                <span *ngIf="updatingUserId !== user.id">إعادة تعيين</span>
+              </button>
+            </td>
             <td class="actions-cell">
               <button 
                 class="action-btn" 
@@ -106,6 +117,7 @@
                 (click)="toggleBlockStatus(user)"
                 [title]="user.type === 2 ? 'لا يمكن حظر المسؤول' : (user.isLocked ? 'إلغاء الحظر' : 'حظر')">
                 <span *ngIf="updatingUserId === user.id">...</span>
+
                 <span *ngIf="updatingUserId !== user.id">{{ user.isLocked ? 'إلغاء الحظر' : 'حظر' }}</span>
               </button>
             </td>

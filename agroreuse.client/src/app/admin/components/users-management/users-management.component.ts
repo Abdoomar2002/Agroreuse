@@ -136,7 +136,25 @@ export class UsersManagementComponent implements OnInit {
       }
     });
   }
+  resetUserPassword(user: User): void
+  {
+    if (!confirm(`هل تريد إعادة تعيين كلمة المرور للمستخدم "${user.fullName}"؟`)) {
+      return;
+    }
 
+    this.updatingUserId = user.id;
+    this.usersService.resetUserPassword(user.id).subscribe({
+      next: () => {
+        this.updatingUserId = null;
+        alert('تم إعادة تعيين كلمة المرور للمستخدم');
+      },
+      error: (err) => {
+        this.updatingUserId = null;
+        alert('فشل إعادة تعيين كلمة المرور');
+        console.error(err);
+      }
+    });
+  }
   get farmersCount(): number {
     return this.allUsers.filter(u => u.type === 0).length;
   }

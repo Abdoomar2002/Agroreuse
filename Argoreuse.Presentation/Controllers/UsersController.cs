@@ -64,6 +64,25 @@ namespace WebUI.Controllers
                 Data = new { userId, isBlocked = request.IsBlocked }
             });
         }
+        [HttpPut("{userId}/reset-password")]
+        [Authorize(Policy = "AdminOnly")]
+        public async Task<IActionResult> ResetUserPassword(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return NotFound(new { Success = false, Message = "User not found." });
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var newPassword = "123456Aa"; // In a real application, generate a secure random password
+            var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
+            if (!result.Succeeded)
+                return BadRequest(new { Success = false, Message = "Failed to reset user password." });
+            return Ok(new
+            {
+                Success = true,
+                Message = "User password has been reset.",
+                Data = new { userId, newPassword }
+            });
+        }
     }
 
     public class SetBlockStatusRequest

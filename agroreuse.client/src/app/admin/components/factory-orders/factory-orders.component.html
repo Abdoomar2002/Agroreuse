@@ -86,9 +86,6 @@
             <th class="sortable" (click)="onSort('quantity')" [class.sorted]="isSortedBy('quantity')">
               الكمية <span class="sort-icon">{{ getSortIcon('quantity') }}</span>
             </th>
-            <th class="sortable" (click)="onSort('numberOfDays')" [class.sorted]="isSortedBy('numberOfDays')">
-              المدة <span class="sort-icon">{{ getSortIcon('numberOfDays') }}</span>
-            </th>
             <th class="sortable" (click)="onSort('addressDetails')" [class.sorted]="isSortedBy('addressDetails')">
               العنوان <span class="sort-icon">{{ getSortIcon('addressDetails') }}</span>
             </th>
@@ -114,7 +111,6 @@
             </td>
             <td>{{ order.categoryName }}</td>
             <td>{{ order.quantity }} طن</td>
-            <td>{{ order.numberOfDays }} أسبوع</td>
             <td class="address-cell" [title]="order.addressDetails">{{ order.addressDetails }}</td>
             <td class="truncate-cell" [title]="order.description">{{ order.description!=null && order.description.length > 30 ? (order.description | slice:0:30) + '...' : order.description }}</td>
             <td>
@@ -165,10 +161,6 @@
           <div class="detail-item">
             <label>الكمية</label>
             <p>{{ selectedOrder.quantity }} طن</p>
-          </div>
-          <div class="detail-item">
-            <label>المدة</label>
-            <p>{{ selectedOrder.numberOfDays }} أسبوع</p>
           </div>
           <div class="detail-item full-width">
             <label>العنوان</label>
